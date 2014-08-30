@@ -27,6 +27,7 @@ main = runSqlite "test.db" $ do
     runMigration migrateAll
 
     johnId <- insert $ Person "John Doe" $ Just 35
+--    johnId <- insert $ Person "John Doe" Just 35 -- NG
     janeId <- insert $ Person "Jane Doe" Nothing
 
     insert $ BlogPost "My fr1st p0st" johnId
