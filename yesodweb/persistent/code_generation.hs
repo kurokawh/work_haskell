@@ -21,19 +21,22 @@ import Database.Persist.TH      -- persistent-templateパッケージ
 --   persistentLowaCaseはテーブル名・フィールド名に、"_"区切り小文字を
 --   利用することを指示している。
 share [mkPersist sqlSettings, mkMigrate "migrateAll"] [persistLowerCase|
-Person             -- personテーブル
+Person             -- personテーブル。プライマリキーとして"id"カラム自動生成。
     name String    -- nameカラム（VARCHAR, NOT NULL制約）
-    age Int Maybe  -- ageカラム（INTEGER, NULLあり）
+    age Int Maybe  -- ageカラム（INTEGER, MaybeはNULLを許容することを意味する）
     deriving Show
 |]
 
 main :: IO ()
 main = runSqlite ":memory:" $ do -- DBオープン時の引数。メモリDB利用。"test.db"等の
                                  -- ファイル名を渡すとファイルDBがオープンされる。
+    -- personテーブル生成
+    runMigration migrateAll
+
     -- name: "Michael", age: 26 のレコードを INSERT
-    -- id（row-id）が返値として返される。
+    -- id（プライマリキー）が返値として返される。
     michaelId <- insert $ Person "Michael" $ Just 26
-    -- row-id でレコードを SELECT。該当レコードが返される。
+    -- id でレコードを SELECT。該当レコードが返される。
     michael <- get michaelId
-    -- 返されたレコードを表示。
+    -- 返されたレコード（Personインスタンス）を表示。
     liftIO $ print michael
