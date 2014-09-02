@@ -10,6 +10,9 @@ import           Database.Persist
 import           Database.Persist.Sqlite
 import           Database.Persist.TH
 
+import           Control.Monad.Logger (NoLoggingT)
+import           Control.Monad.Trans.Resource.Internal (ResourceT)
+
 share [mkPersist sqlSettings, mkMigrate "migrateAll"] [persistLowerCase|
 Person
     firstName String
@@ -19,7 +22,10 @@ Person
     deriving Show
 |]
 
---fechingById :: IO ()
+fechingById :: SqlPersistT 
+               (Control.Monad.Logger.NoLoggingT
+                (Control.Monad.Trans.Resource.Internal.ResourceT IO))
+               ()
 fechingById = do
     personId <- insert $ Person "Michael2" "Snoyman2" 26
     maybePerson <- get personId
