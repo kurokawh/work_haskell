@@ -10,8 +10,8 @@ import           Database.Persist
 import           Database.Persist.Sqlite
 import           Database.Persist.TH
 
-import           Control.Monad.Logger (NoLoggingT)
-import           Control.Monad.Trans.Resource.Internal (ResourceT)
+import           Control.Monad.Logger
+import           Control.Monad.Trans.Resource.Internal
 
 share [mkPersist sqlSettings, mkMigrate "migrateAll"] [persistLowerCase|
 Person
