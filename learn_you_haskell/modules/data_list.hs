@@ -1,5 +1,6 @@
 -- Data.List
 import Data.List
+import Data.Function -- only for `on`
 
 -- intersperse takes an element and a list and then puts that element 
 -- in between each pair of elements in the list.
@@ -183,3 +184,105 @@ f1 = find (>4) [1,2,3,4,5,6]
 -- Just 5  
 f2 = find (>9) [1,2,3,4,5,6]  
 -- Nothing  
+
+
+-- ghci> :t elemIndex  
+-- elemIndex :: (Eq a) => a -> [a] -> Maybe Int  
+e1 = 4 `elemIndex` [1,2,3,4,5,6]  
+-- Just 3  
+e2 = 10 `elemIndex` [1,2,3,4,5,6]  
+-- Nothing
+
+-- lemIndices is like elemIndex, only it returns a list of indices, 
+e3 = ' ' `elemIndices` "Where are the spaces?"  
+-- [5,9,13]  
+
+
+fi1 = findIndex (==4) [5,3,2,1,6,4]  
+-- Just 5  
+fi2 =  findIndex (==7) [5,3,2,1,6,4]  
+-- Nothing  
+fi3 =  findIndices (`elem` ['A'..'Z']) "Where Are The Caps?"  
+-- [0,6,10,14]  
+
+
+z1 = zipWith3 (\x y z -> x + y + z) [1,2,3] [4,5,2,2] [2,2,3]  
+-- [7,9,8]  
+z2 = zip4 [2,3,3] [2,2,2] [5,5,3] [2,2,2]  
+-- [(2,2,5,2),(3,2,5,2),(3,2,3,2)]  
+
+
+l1 = lines "first line\nsecond line\nthird line"  
+-- ["first line","second line","third line"]  
+ul1 = unlines ["first line", "second line", "third line"]  
+-- "first line\nsecond line\nthird line\n"  
+
+-- words and unwords are for splitting a line of text into words or 
+-- joining a list of words into a text.
+w1 = words "hey these are the words in this sentence"  
+-- ["hey","these","are","the","words","in","this","sentence"]  
+w2 = words "hey these           are    the words in this\nsentence"  
+-- ["hey","these","are","the","words","in","this","sentence"]  
+uw1 = unwords ["hey","there","mate"]  
+-- "hey there mate"  
+
+
+-- It takes a list and weeds out the duplicate elements, 
+-- returning a list whose every element is a unique snowflake!
+n1 = nub [1,2,3,4,3,2,1,2,3,4,3,2,1]  
+-- [1,2,3,4]  
+n2 = nub "Lots of words and stuff"  
+-- "Lots fwrdanu" 
+
+
+d1 = delete 'h' "hey there ghang!"  
+-- "ey there ghang!"  
+d2 = delete 'h' . delete 'h' $ "hey there ghang!"  
+-- "ey tere ghang!"  
+d3 = delete 'h' . delete 'h' . delete 'h' $ "hey there ghang!"  
+-- "ey tere gang!"  
+
+
+--  For every element in the right-hand list, 
+-- // it removes a matching element in the left one.
+xx1 = [1..10] \\ [2,5,9]  
+-- [1,3,4,6,7,8,10]  
+xx2 = "Im a big baby" \\ "big"  
+-- "Im a  baby"  
+
+
+u1 = "hey man" `union` "man what's up"  
+-- "hey manwt'sup"  
+u2 = [1..7] `union` [5..10]  
+-- [1,2,3,4,5,6,7,8,9,10]  
+i1 =  [1..7] `intersect` [5..10]  
+-- [5,6,7]  
+
+
+-- insert will start at the beginning of the list and then 
+-- keep going until it finds an element that's equal to or 
+-- greater than the element that we're inserting and it will 
+-- insert it just before the element.
+ist1 = insert 4 [3,5,1,2,8,2]  
+-- [3,4,5,1,2,8,2]  
+ist2 =  insert 4 [1,3,4,4,1]  
+-- [1,3,4,4,4,1]  
+
+
+-- Data.List has their more generic equivalents, named genericLength, genericTake, genericDrop, genericSplitAt, genericIndex and genericReplicate. 
+-- The nub, delete, union, intersect and group functions all have their more general counterparts called nubBy, deleteBy, unionBy, intersectBy and groupBy.
+values = [-4.3, -2.4, -1.2, 0.4, 2.3, 5.9, 10.5, 29.1, 5.3, -2.4, -14.5, 2.9, 2.3]  
+gb1 = groupBy (\x y -> (x > 0) == (y > 0)) values  
+-- [[-4.3,-2.4,-1.2],[0.4,2.3,5.9,10.5,29.1,5.3],[-2.4,-14.5],[2.9,2.3]]  
+
+
+
+-- on :: (b -> b -> c) -> (a -> b) -> a -> a -> c  
+-- f `on` g = \x y -> f (g x) (g y)  
+-- So doing (==) `on` (> 0) returns an equality function that looks like \x y -> (x > 0) == (y > 0). 
+gbo = groupBy ((==) `on` (> 0)) values  
+-- [[-4.3,-2.4,-1.2],[0.4,2.3,5.9,10.5,29.1,5.3],[-2.4,-14.5],[2.9,2.3]]  
+
+xs = [[5,4,5,4,4],[1,2,3],[3,5,4,3],[],[2],[2,2]]  
+sb = sortBy (compare `on` length) xs
+-- [[],[2],[2,2],[1,2,3],[3,5,4,3],[5,4,5,4,4]]  
