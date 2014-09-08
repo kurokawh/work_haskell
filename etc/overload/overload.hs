@@ -19,3 +19,29 @@ instance Foo String where
 main = do
     putStrLn $ foo 1
     putStrLn $ foo "1"
+
+
+{-
+/**
+ * overload sample of C++
+ */
+#include <iostream>
+#include <string>
+
+using namespace std;
+
+string foo(int i) {
+    if (i == 1) return "bar";
+    return "?";
+}
+
+string foo(const string &s) {
+    if (s == "1") return "baz";
+    return "?";
+}
+
+int main() {
+    cout << foo(1) << endl;
+    cout << foo("1") << endl;
+}
+-}
