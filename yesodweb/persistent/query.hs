@@ -22,8 +22,12 @@ Person
     deriving Show
 |]
 
--- data Holder = Person | Entity a b deriving (Show)
 
+{-
+    case maybePerson of
+      Nothing -> liftIO $ putStrLn "Just kidding, not really there"
+      Just person -> liftIO $ print person
+-}
 printPerson :: Show a => Maybe a -> SqlPersistT 
                (Control.Monad.Logger.NoLoggingT
                            (Control.Monad.Trans.Resource.Internal.ResourceT IO))
@@ -31,12 +35,16 @@ printPerson :: Show a => Maybe a -> SqlPersistT
 printPerson Nothing = liftIO $ putStrLn "Just kidding, not really there"
 printPerson (Just person) = liftIO $ print person
 
+{-
+    case maybePerson of
+        Nothing -> liftIO $ putStrLn "Just kidding, not really there"
+        Just (Entity personId person) -> liftIO $ print person
+-}
 printPersonE :: Show a => (Maybe (Entity a)) -> SqlPersistT 
                 (Control.Monad.Logger.NoLoggingT
                             (Control.Monad.Trans.Resource.Internal.ResourceT IO))
                 ()
---printPersonE Nothing = printPerson (Nothing)
-printPersonE Nothing = liftIO $ putStrLn "xx"
+printPersonE Nothing = printPerson (Nothing :: Maybe (PersonGeneric SqlBackend))
 printPersonE (Just (Entity _ person)) = liftIO $ print person
 
 
@@ -48,11 +56,6 @@ fetchingById = do
     personId <- insert $ Person "Michael2" "Snoyman2" 26
     maybePerson <- get personId
     printPerson maybePerson
-{-
-    case maybePerson of
-      Nothing -> liftIO $ putStrLn "Just kidding, not really there"
-      Just person -> liftIO $ print person
--}
 
 fetchingByUniqueConstraint :: SqlPersistT 
                               (Control.Monad.Logger.NoLoggingT
@@ -60,13 +63,12 @@ fetchingByUniqueConstraint :: SqlPersistT
                               ()
 fetchingByUniqueConstraint = do
     personId <- insert $ Person "Michael" "Snoyman" 26
+    -- OK case
     maybePerson <- getBy $ UniqueName "Michael" "Snoyman"
     printPersonE maybePerson
-{-
-    case maybePerson of
-        Nothing -> liftIO $ putStrLn "Just kidding, not really there"
-        Just (Entity personId person) -> liftIO $ print person
--}
+    -- test Nothing
+    notFoundPerson <- getBy $ UniqueName "Not-Found" "Name"
+    printPersonE notFoundPerson
 
 main :: IO ()
 main = runSqlite ":memory:" $ do
