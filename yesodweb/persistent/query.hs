@@ -23,37 +23,17 @@ Person
     deriving Show
 |]
 
-{-
-class PersonPrinter a where
-    printPerson :: (SqlPersistT 
-                    (Control.Monad.Logger.NoLoggingT 
-                     (Control.Monad.Trans.Resource.Internal.ResourceT IO)) b) => a -> b
--}
+-- type class to overload printPerson()
 class PersonString a where
     printPerson :: a -> IO ()
 
-{-
-    case maybePerson of
-      Nothing -> liftIO $ putStrLn "Just kidding, not really there"
-      Just person -> liftIO $ print person
-instance (Show a) => PersonPrinter (Maybe a) where
-    printPerson Nothing = liftIO $ putStrLn "Just kidding, not really there"
-    printPerson (Just person) = liftIO $ print person
--}
---instance (Show a) => PersonString (Maybe a) where
+-- printPerson() for get()
+--instance (Show a) => PersonString (Maybe a) where  // error : cannot distinguish
 instance PersonString (Maybe (PersonGeneric SqlBackend)) where
     printPerson Nothing = putStrLn "Just kidding, not really there"
     printPerson (Just person) = print person
     
-
-{-
-    case maybePerson of
-        Nothing -> liftIO $ putStrLn "Just kidding, not really there"
-        Just (Entity personId person) -> liftIO $ print person
-instance (Show a) => PersonPrinter (Maybe (Entity a)) where
-    printPerson Nothing = printPerson (Nothing :: Maybe (PersonGeneric SqlBackend))
-    printPerson (Just (Entity _ person)) = liftIO $ print person
--}
+-- printPerson() for getBy()
 instance (Show a) => PersonString (Maybe (Entity a)) where
     printPerson Nothing = printPerson (Nothing :: Maybe (PersonGeneric SqlBackend))
     printPerson (Just (Entity _ person)) = print person
