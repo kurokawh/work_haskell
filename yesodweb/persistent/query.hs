@@ -38,19 +38,23 @@ instance (Show a) => PersonString (Maybe (Entity a)) where
     printPerson Nothing = printPerson (Nothing :: Maybe (PersonGeneric SqlBackend))
     printPerson (Just (Entity _ person)) = print person
 
+{-
 fetchingById :: SqlPersistT 
                 (Control.Monad.Logger.NoLoggingT
                  (Control.Monad.Trans.Resource.Internal.ResourceT IO))
                 ()
+-}
 fetchingById = do
-    personId <- insert $ Person "Michael2" "Snoyman2" 26
+    personId <- insert $ Person "Michael2" "Snoyman2" 27
     maybePerson <- get personId
     liftIO $ printPerson maybePerson
 
+{-
 fetchingByUniqueConstraint :: SqlPersistT 
                               (Control.Monad.Logger.NoLoggingT
                                (Control.Monad.Trans.Resource.Internal.ResourceT IO))
                               ()
+-}
 fetchingByUniqueConstraint = do
     personId <- insert $ Person "Michael" "Snoyman" 26
     -- OK case
