@@ -5,6 +5,7 @@
 {-# LANGUAGE QuasiQuotes       #-}
 {-# LANGUAGE TemplateHaskell   #-}
 {-# LANGUAGE TypeFamilies      #-}
+{-# LANGUAGE FlexibleInstances    #-}
 import           Control.Monad.IO.Class  (liftIO)
 import           Database.Persist
 import           Database.Persist.Sqlite
@@ -22,31 +23,40 @@ Person
     deriving Show
 |]
 
+{-
+class PersonPrinter a where
+    printPerson :: (SqlPersistT 
+                    (Control.Monad.Logger.NoLoggingT 
+                     (Control.Monad.Trans.Resource.Internal.ResourceT IO)) b) => a -> b
+-}
+class PersonString a where
+    printPerson :: a -> IO ()
 
 {-
     case maybePerson of
       Nothing -> liftIO $ putStrLn "Just kidding, not really there"
       Just person -> liftIO $ print person
+instance (Show a) => PersonPrinter (Maybe a) where
+    printPerson Nothing = liftIO $ putStrLn "Just kidding, not really there"
+    printPerson (Just person) = liftIO $ print person
 -}
-printPerson :: Show a => Maybe a -> SqlPersistT 
-               (Control.Monad.Logger.NoLoggingT
-                           (Control.Monad.Trans.Resource.Internal.ResourceT IO))
-               ()
-printPerson Nothing = liftIO $ putStrLn "Just kidding, not really there"
-printPerson (Just person) = liftIO $ print person
+--instance (Show a) => PersonString (Maybe a) where
+instance PersonString (Maybe (PersonGeneric SqlBackend)) where
+    printPerson Nothing = putStrLn "Just kidding, not really there"
+    printPerson (Just person) = print person
+    
 
 {-
     case maybePerson of
         Nothing -> liftIO $ putStrLn "Just kidding, not really there"
         Just (Entity personId person) -> liftIO $ print person
+instance (Show a) => PersonPrinter (Maybe (Entity a)) where
+    printPerson Nothing = printPerson (Nothing :: Maybe (PersonGeneric SqlBackend))
+    printPerson (Just (Entity _ person)) = liftIO $ print person
 -}
-printPersonE :: Show a => (Maybe (Entity a)) -> SqlPersistT 
-                (Control.Monad.Logger.NoLoggingT
-                            (Control.Monad.Trans.Resource.Internal.ResourceT IO))
-                ()
-printPersonE Nothing = printPerson (Nothing :: Maybe (PersonGeneric SqlBackend))
-printPersonE (Just (Entity _ person)) = liftIO $ print person
-
+instance (Show a) => PersonString (Maybe (Entity a)) where
+    printPerson Nothing = printPerson (Nothing :: Maybe (PersonGeneric SqlBackend))
+    printPerson (Just (Entity _ person)) = print person
 
 fetchingById :: SqlPersistT 
                 (Control.Monad.Logger.NoLoggingT
@@ -55,7 +65,7 @@ fetchingById :: SqlPersistT
 fetchingById = do
     personId <- insert $ Person "Michael2" "Snoyman2" 26
     maybePerson <- get personId
-    printPerson maybePerson
+    liftIO $ printPerson maybePerson
 
 fetchingByUniqueConstraint :: SqlPersistT 
                               (Control.Monad.Logger.NoLoggingT
@@ -65,10 +75,10 @@ fetchingByUniqueConstraint = do
     personId <- insert $ Person "Michael" "Snoyman" 26
     -- OK case
     maybePerson <- getBy $ UniqueName "Michael" "Snoyman"
-    printPersonE maybePerson
+    liftIO $ printPerson maybePerson
     -- test Nothing
     notFoundPerson <- getBy $ UniqueName "Not-Found" "Name"
-    printPersonE notFoundPerson
+    liftIO $ printPerson notFoundPerson
 
 main :: IO ()
 main = runSqlite ":memory:" $ do
