@@ -20,25 +20,23 @@ Person
     deriving Show
 |]
 
---person_list = [1,2,3]
 person_list = [(Person "Michael" 26 Male),
-               (Person "Mark" 26 Male),
+               (Person "Mark" 27 Male),
+               (Person "Jhon" 55 Male),
                (Person "Cyndy" 25 Female),
                (Person "Amy" 30 Female),
+               (Person "Linda" 19 Female),
+               (Person "Steve" 41 Male),
+               (Person "Dorothy" 37 Female),
                (Person "Robert" 40 Male),
                (Person "George" 15 Male)]
 
-
 main :: IO ()
-main = runSqlite ":memory:" $ do
+main = runSqlite "person.db" $ do
     runMigration migrateAll
 
-    --michaelId <- insert $ Person "Michael" 26 Male
-    michaelId <- insert $ (person_list !! 0)
-    michael <- get michaelId
+    ids <- mapM insert person_list
+    liftIO $ print ids
+    michael <- get (ids !! 0)
     liftIO $ print michael
-
-    --let id_list = fmap insert person_list::[Person]
-    --michael <- get (id_list !! 0)
-    --liftIO $ print michael
     return ()
