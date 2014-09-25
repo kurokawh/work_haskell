@@ -31,12 +31,28 @@ person_list = [(Person "Michael" 26 Male),
                (Person "Robert" 40 Male),
                (Person "George" 15 Male)]
 
-main :: IO ()
-main = runSqlite "person.db" $ do
-    runMigration migrateAll
+main_get = do
+  -- success to refer Michael
+  michael <- get ((Key (PersistInt64 1)) :: Key (PersonGeneric SqlBackend))
+  liftIO $ print michael
+  -- fail to get with id. Nothing is returned
+  noone <- get ((Key (PersistInt64 100)) :: Key (PersonGeneric SqlBackend))
+  liftIO $ print noone
 
+main_getBy = do
+  -- success to refer Cyndy
+  cyndy <- getBy $ Name "Cyndy"
+  liftIO $ print cyndy
+  -- fail to get with Name. Nothing is returned
+  noone <- getBy $ Name "NotFoundName"
+  liftIO $ print noone
+
+main :: IO ()
+main = runSqlite ":memory:" $ do
+    runMigration migrateAll
     ids <- mapM insert person_list
     liftIO $ print ids
-    michael <- get (ids !! 0)
-    liftIO $ print michael
+
+    main_get
+    main_getBy
     return ()
