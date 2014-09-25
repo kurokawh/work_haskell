@@ -56,6 +56,15 @@ main_getBy = do
   liftIO $ print noone
   print_entity noone
 
+
+main_select = do
+  found <- selectList
+           ( [PersonAge >. 25, PersonAge <=. 30, PersonGender ==. Male]
+             ||. [PersonAge <=. 25, PersonGender ==. Female] )
+           [ Desc PersonName ]
+  liftIO $ print found
+                       
+
 main :: IO ()
 main = runSqlite ":memory:" $ do
     runMigration migrateAll
@@ -64,4 +73,5 @@ main = runSqlite ":memory:" $ do
 
     main_get
     main_getBy
+    main_select
     return ()
