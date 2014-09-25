@@ -33,19 +33,28 @@ person_list = [(Person "Michael" 26 Male),
 
 main_get = do
   -- success to refer Michael
-  michael <- get ((Key (PersistInt64 1)) :: Key (PersonGeneric SqlBackend))
+  michael <- get (Key (PersistInt64 1) :: Key (PersonGeneric SqlBackend))
   liftIO $ print michael
   -- fail to get with id. Nothing is returned
-  noone <- get ((Key (PersistInt64 100)) :: Key (PersonGeneric SqlBackend))
+  noone <- get (Key (PersistInt64 100) :: Key (PersonGeneric SqlBackend))
   liftIO $ print noone
+
+--print_entity :: x -> IO ()
+print_entity Nothing = do
+  liftIO $ print "failed to obtain value..."
+print_entity (Just (Entity key person)) = do
+  liftIO $ print key
+  liftIO $ print person
 
 main_getBy = do
   -- success to refer Cyndy
   cyndy <- getBy $ Name "Cyndy"
   liftIO $ print cyndy
+  print_entity cyndy
   -- fail to get with Name. Nothing is returned
   noone <- getBy $ Name "NotFoundName"
   liftIO $ print noone
+  print_entity noone
 
 main :: IO ()
 main = runSqlite ":memory:" $ do
