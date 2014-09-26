@@ -26,7 +26,7 @@ person_list = [(Person "Michael" 26 Male),
                (Person "Cyndy" 25 Female),
                (Person "Amy" 30 Female),
                (Person "Linda" 19 Female),
-               (Person "Steve" 41 Male),
+               (Person "Steve" 42 Male),
                (Person "Dorothy" 37 Female),
                (Person "Robert" 40 Male),
                (Person "George" 15 Male)]
@@ -58,11 +58,13 @@ main_getBy = do
 
 
 main_select = do
+  -- 厄年（男性：25 or 52 or 62, 女性：19 or 33, 37）の人を検索し名前順で取得
   found <- selectList
-           ( [PersonAge >. 25, PersonAge <=. 30, PersonGender ==. Male]
-             ||. [PersonAge <=. 25, PersonGender ==. Female] )
-           [ Desc PersonName ]
-  liftIO $ print found
+           ( [PersonGender ==. Male, PersonAge <-. [25, 42, 61]]
+             ||. [PersonGender ==. Female, PersonAge <-. [19, 33, 37]] )
+           [ Asc PersonName ]
+  -- 結果として得た Entity のリストを順に表示
+  liftIO $ mapM print found
                        
 
 main :: IO ()
