@@ -9,6 +9,8 @@ import Control.Monad.IO.Class  (liftIO)
 import Database.Persist
 import Database.Persist.Sqlite
 import Database.Persist.TH
+import Data.Conduit
+import qualified Data.Conduit.List as CL
 import Gender
 
 share [mkPersist sqlSettings, mkMigrate "migrateAll"] [persistLowerCase|
@@ -65,7 +67,11 @@ main_select = do
            [ Asc PersonName ]
   -- 結果として得た Entity のリストを順に表示
   liftIO $ mapM print found
-                       
+
+main_rawsql = do                       
+  -- 名前が"y"で愁嘆するPersonを検索
+  let sql = "SELECT name FROM Person WHERE name LIKE '%y'"
+  rawQuery sql [] $$ CL.mapM_ (liftIO . print)
 
 main :: IO ()
 main = runSqlite ":memory:" $ do
@@ -76,4 +82,5 @@ main = runSqlite ":memory:" $ do
     main_get
     main_getBy
     main_select
+    main_rawsql
     return ()
