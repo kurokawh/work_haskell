@@ -9,6 +9,6 @@ main :: IO ()
 main = do
     args <- getArgs
     output <- case args of
-                [] -> "cat: must specify some files"
+                [] -> return "cat: must specify some files"
                 fs -> liftM concat (mapM readFile fs)
     putStrLn output
