@@ -7,4 +7,4 @@ import System.Environment
 main :: IO ()
 main = do
     [from,to] <- getArgs
-    writeFile to $ readFile from
+    writeFile to =<< readFile from
