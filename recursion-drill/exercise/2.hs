@@ -59,30 +59,40 @@ my_mul_iter x y = iter x y x
 
 -- my_plus :: Integer -> Integer -> Integer
 -- my_plus m 0 = m
--- my_plus m n = plus m (n - 1) + 1
+-- my_plus m n = my_plus m (n - 1) + 1
 
 my_plus_iter :: Integer -> Integer -> Integer
-my_plus_iter x y = iter x y undefined
+my_plus_iter x y = iter x y x
   where
     iter :: Integer -> Integer -> Integer -> Integer
-    iter = undefined
+    iter _ 0 acc = acc
+    iter x y acc = iter x (y - 1) (acc + 1)
 
 -- my_minus :: Integer -> Integer -> Integer
 -- my_minus m 0 = m
 -- my_minus m n = minus m (n - 1) - 1
 
 my_minus_iter :: Integer -> Integer -> Integer
-my_minus_iter x y = iter x y undefined
+my_minus_iter x y = iter x y x
   where
     iter :: Integer -> Integer -> Integer -> Integer
-    iter = undefined
+    iter _ 0 acc = acc
+    iter x y acc = iter x (y - 1) (acc - 1)
 
 -- my_power :: Integer -> Integer -> Integer
 -- my_power _ 0 = 1
 -- my_power m n = power m (n - 1) * m
 
 my_power_iter :: Integer -> Integer -> Integer
-my_power_iter x y = iter x y undefined
+my_power_iter x y = iter x y x
   where
     iter :: Integer -> Integer -> Integer -> Integer
-    iter = undefined
+    iter _ 0 _ = 1
+    iter _ 1 acc = acc
+    iter x y acc = iter x (y - 1) (acc * x)
+
+my_power_iter_answer :: Integer -> Integer -> Integer
+my_power_iter_answer x y = iter x y ?
+  where
+    iter :: Integer -> Integer -> Integer -> Integer
+    iter = ?
