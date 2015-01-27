@@ -82,17 +82,30 @@ my_minus_iter x y = iter x y x
 -- my_power :: Integer -> Integer -> Integer
 -- my_power _ 0 = 1
 -- my_power m n = power m (n - 1) * m
+--- power m 0 = 1
+--- power m 1 = 1 * m
+--- power m 2 = 1 * m * m
+--- power m 3 = 1 * m * m * m
 
-my_power_iter :: Integer -> Integer -> Integer
-my_power_iter x y = iter x y x
+my_power_iter2 :: Integer -> Integer -> Integer
+my_power_iter2 x y = iter x y x
   where
     iter :: Integer -> Integer -> Integer -> Integer
     iter _ 0 _ = 1
     iter _ 1 acc = acc
     iter x y acc = iter x (y - 1) (acc * x)
 
-my_power_iter_answer :: Integer -> Integer -> Integer
-my_power_iter_answer x y = iter x y ?
+my_power_iter :: Integer -> Integer -> Integer
+my_power_iter x y = iter x y y
   where
     iter :: Integer -> Integer -> Integer -> Integer
-    iter = ?
+    iter _ _ 0 = 1
+    iter x y acc = iter x y (acc - 1) * x -- NG: not tail recursion
+
+ans_power_iter :: Integer -> Integer -> Integer
+ans_power_iter x y = iter x y 1
+  where
+    iter :: Integer -> Integer -> Integer -> Integer
+    iter _ 0 acc = acc
+    iter m n acc = iter m (n - 1) (acc * m)
+                   
