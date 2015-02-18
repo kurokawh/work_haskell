@@ -37,10 +37,13 @@ my_mul m 1 = m
 my_mul m n = my_mul m (n - 1) + m
 
 my_plus :: Integer -> Integer -> Integer
-my_plus = undefined
+my_plus m 0 = m
+my_plus m n = my_plus m (n - 1) + 1
 
 my_minus :: Integer -> Integer -> Integer
-my_minus = undefined
+my_minus m 0 = m
+my_minus m n = my_minus m (n - 1) - 1
 
 my_power :: Integer -> Integer -> Integer
-my_power = undefined
+my_power m 0 = 1
+my_power m n = my_power m (n - 1) * m
