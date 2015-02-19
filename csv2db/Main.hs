@@ -26,6 +26,17 @@ config = MyArgs {
     , csvfiles = def &= typ "CSV_FILES" &= args -- &= help help_csvfiles
 } &= program "csv2db" &= help help_program
 
+dispatch :: [(String, MyArgs -> IO ())]
+dispatch =  [ ("sqlite", to_sqlite)
+--            , ("postgresql", to_postgresql)
+--            , ("mysql", to_mysql)
+            ]
+
+to_sqlite args = do
+  return ()
+
 main = do
   args <- cmdArgs config
-  print args
+  let (Just register) = lookup (dbopt　args) dispatch
+  -- print args
+  register args
