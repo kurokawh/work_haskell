@@ -1,30 +1,35 @@
 {-# LANGUAGE DeriveDataTypeable #-}
 import System.Console.CmdArgs
+import Database.Persist
+import Database.Persist.Sqlite
+import Database.Persist.TH
+import MyArgs
 
-data MyArgs = MyArgs {
-      dbopt    :: String
-    , schema   :: String
-    , targetdb   :: String
-    , csvfiles :: [String]
-    } deriving (Data,Typeable,Show)
+{-
+share [mkPersist sqlSettings, mkMigrate "migrateAll"] [persistLowerCase|
+Person
+    name String
+    age Int
+    gender Gender -- Genderカラム（VARCHAR: Male or Female）
+    Name name     -- nameカラムにUnique制約を付与
+    deriving Show
+| ]
+-}
+mkPersist sqlSettings [persistLowerCase|
+  Parent
+      name  String maxlen=20
+      name2 String maxlen=20
+      age Int
+      Primary name name2 age
+      deriving Show Eq
+  Child
+      name  String maxlen=20
+      name2 String maxlen=20
+      age Int
+      Foreign Parent fkparent name name2 age
+      deriving Show Eq
+|]
 
-help_dbopt = "specify db type. default db is sqlite.\n"
-             ++ "PostgreSQL, MySQL, etc. will be supported in the future."
-help_schema = "specify table name.\n"
-              ++ "specify field name & field type for each column.\n"
-              ++ "- default filed name: c1, c2, ...\n"
-              ++ "- default field type: VARCHAR."
-help_targetdb = "specify DB file for sqlite."
-help_csvfiles = "specify one ore more csv files.\n"
-	        ++ "one file must be specified at the minimum."
-help_program = "parse CSV files and store all data into DB."
-
-config = MyArgs {
-      dbopt   = "sqlite" &= typ "TARGET_DB_TYPE" &= help help_dbopt
-    , schema  = "" &= typ "SCHEMA_DEF_FILE" &= help help_schema
-    , targetdb  = def &= typ "TARGET_DB" &= argPos 0 -- &= help help_targetdb
-    , csvfiles = def &= typ "CSV_FILES" &= args -- &= help help_csvfiles
-} &= program "csv2db" &= help help_program
 
 dispatch :: [(String, MyArgs -> IO ())]
 dispatch =  [ ("sqlite", to_sqlite)
