@@ -40,7 +40,8 @@ Record
     p8 String
     p9 String
     p10 String
-    deriving Show
+    Primary serverTime
+    deriving Show Eq
 |]
 
 dispatch :: [(String, MyArgs -> IO ())]
