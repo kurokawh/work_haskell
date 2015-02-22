@@ -1,4 +1,7 @@
 recursion-drill/drill_
 csv2db/dist
+csv2db/cabal-sandbox.config
 csv2db/.cabal-sandbox
+csv2db/*.o
+csv2db/*.hi
 hey_hey_haskell/parconc-examples-0.3.4/dist
