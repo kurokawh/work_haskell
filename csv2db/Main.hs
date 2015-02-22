@@ -19,7 +19,7 @@ import MyArgs
    EmptyDataDecls   
 -}
 share [mkPersist sqlSettings, mkMigrate "migrateAll"] [persistLowerCase|
-Person
+Record
     serverTime String -- Int?
     consoleType Int
     systemVer Int
@@ -49,8 +49,18 @@ dispatch =  [ ("sqlite", to_sqlite)
 --            , ("mysql", to_mysql)
             ]
 
+
+files_to_records :: [String] -> [Record]
+files_to_records csvfiles = 
+    [
+     Record "20150213103400" 1 2501030 385 16 False "20150109-01" "2015021310290298" 2 "097a7e482eec53225e524ddfa2c4b5b755b7eceaa507e1ac3c089ca816686ceb" "" "" "" "" "" "" "" "" "" ""
+    ]
+
+
+
 to_sqlite args = runSqlite (pack $ targetdb args) $ do
   runMigration migrateAll
+  mapM insert (files_to_records (csvfiles args))
   return ()
 
 main = do
