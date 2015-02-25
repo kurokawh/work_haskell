@@ -18,8 +18,18 @@ instance FromRecord Person where
         | V.length v == 2 = Person <$>
                           v .! 0 <*>
                           v .! 1
+        | V.length v == 10 = Person <$>
+                          v .! 0 <*>
+                          v .! 1
+        | V.length v == 20 = Person <$>
+                          v .! 18 <*>
+                          v .! 19
         | otherwise     = mzero
 
+-- this program runs with:
+-- > runghc person.hs no_header.csv
+-- > runghc person.hs 10.csv
+-- > runghc person.hs 20.csv
 main :: IO ()
 main = do
     (filename:args) <- getArgs  
