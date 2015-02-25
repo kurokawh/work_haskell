@@ -29,7 +29,7 @@ Record
     logConfVer String
     timestamp String -- Int?
     clockType Int
-    ps4UniqueId String
+    uniqueId String
     p1 String
     p2 String
     p3 String
