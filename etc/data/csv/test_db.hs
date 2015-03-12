@@ -56,6 +56,7 @@ type Row10 = (String,
               String, 
               String)
 
+{-                
 instance (FromField a, FromField b, FromField c, FromField d, FromField e,
           FromField f, FromField g, FromField h, FromField i, FromField j) =>
          FromRecord (a, b, c, d, e, f, g, h, i, j) where
@@ -70,6 +71,13 @@ instance (FromField a, FromField b, FromField c, FromField d, FromField e,
                                  <*> unsafeIndex v 7
                                  <*> unsafeIndex v 8
                                  <*> unsafeIndex v 9
+-}
+instance FromRecord Salary where
+    parseRecord v
+        | V.length v == 10 = Salary <$>
+                          v .! 0 <*>
+                          v .! 1
+
 --        | otherwise = lengthMismatch 10 v
 --        | otherwise = (Fail "a" "b") --Done [Left "x"] 
           where
@@ -80,6 +88,8 @@ to_sal (x, y) = Salary x y
 
 v2v v = V.map to_sal v
 
+-- currently only following command is supported:
+-- % runghc test_db.hs 10.csv
 main :: IO ()
 main = do
     (filename:args) <- getArgs  
@@ -90,6 +100,7 @@ main = do
 --          V.mapM_ (putStrLn.show) (v2v v)
 --          V.mapM_ (putStrLn.show) (v :: (V.Vector (String, Int)))
 --          V.mapM_ (putStrLn.show) (v :: (V.Vector (String, String)))
-          V.mapM_ (putStrLn.show) (v :: (V.Vector Row10))
+--          V.mapM_ (putStrLn.show) (v :: (V.Vector Row10))
+          V.mapM_ (putStrLn.show) (v :: (V.Vector Salary))
 --          V.mapM_ (putStrLn.show) (v :: (V.Vector Row9))
           putStrLn ""
