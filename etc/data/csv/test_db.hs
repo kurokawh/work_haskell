@@ -47,18 +47,17 @@ main1 = do
     csvData <- BL.readFile filename
     case decode NoHeader csvData of
         Left err -> putStrLn err
-        Right v -> do
-          V.mapM_ (putStrLn.show) (v :: (V.Vector Person))
-          putStrLn ""
+        Right v -> main2 v
+--          V.mapM_ (putStrLn.show) (v :: (V.Vector Person))
+--          putStrLn ""
 
 -- copied from YesodPerson.hs.
-main2 :: IO ()
-main2 = runSqlite ":memory:" $ do
+main2 :: V.Vector Person -> IO ()
+main2 v = runSqlite "test.db" $ do
     -- this line added: that's it!
     runMigration $ migrate entityDefs $ entityDef (Nothing :: Maybe Person)
-    michaelId <- insert $ Person "Michael" 26
-    michael <- get michaelId
-    liftIO $ print michael
+    ids <- V.mapM insert v
+    liftIO $ print ids
 
 
 main :: IO ()
