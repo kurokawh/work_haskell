@@ -7,9 +7,13 @@
 {-# LANGUAGE QuasiQuotes                #-}
 {-# LANGUAGE TemplateHaskell            #-}
 {-# LANGUAGE TypeFamilies               #-}
-module yesod_person -- ERROR!!! need to be YesodPerson
-( Person
+module YesodPerson
+( Person(..)
+, entityDefs
+, entityKey
+, entityDB
 ) where
+-- module yesod_person -- ERROR!!! module name must start with capital.
 
 import Database.Persist
 import Database.Persist.Sqlite

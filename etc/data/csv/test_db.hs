@@ -1,3 +1,4 @@
+{-# LANGUAGE OverloadedStrings          #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 
 import System.Environment   
@@ -9,6 +10,11 @@ import qualified Data.Vector as V
 import Control.Applicative (Alternative, Applicative, (<*>), (<$>), (<|>),
                             (<*), (*>), empty, pure)
 
+import Database.Persist
+import Database.Persist.Sqlite
+import Control.Monad.IO.Class (liftIO)
+import YesodPerson
+    
 data Salary = Salary {
       name :: String
     , salary :: Int
@@ -90,8 +96,8 @@ v2v v = V.map to_sal v
 
 -- currently only following command is supported:
 -- % runghc test_db.hs 10.csv
-main :: IO ()
-main = do
+main2 :: IO ()
+main2 = do
     (filename:args) <- getArgs  
     csvData <- BL.readFile filename
     case decode NoHeader csvData of
@@ -104,3 +110,12 @@ main = do
           V.mapM_ (putStrLn.show) (v :: (V.Vector Salary))
 --          V.mapM_ (putStrLn.show) (v :: (V.Vector Row9))
           putStrLn ""
+
+-- copied from YesodPerson.hs.
+main :: IO ()
+main = runSqlite ":memory:" $ do
+    -- this line added: that's it!
+    runMigration $ migrate entityDefs $ entityDef (Nothing :: Maybe Person)
+    michaelId <- insert $ Person "Michael" 26
+    michael <- get michaelId
+    liftIO $ print michael
