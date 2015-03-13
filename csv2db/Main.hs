@@ -1,48 +1,12 @@
-{-# LANGUAGE GADTs             #-}
-{-# LANGUAGE QuasiQuotes       #-}
-{-# LANGUAGE TemplateHaskell   #-}
-{-# LANGUAGE TypeFamilies      #-}
 {-# LANGUAGE MultiParamTypeClasses      #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 import System.Console.CmdArgs
 import Database.Persist
 import Database.Persist.Sqlite
-import Database.Persist.TH
 import Data.Text (pack)
 import MyArgs
+import Telemetry
 
-{-
- removed LANGUAGE opt:
-   FlexibleContexts 
-   OverloadedStrings 
-   DeriveDataTypeable 
-   EmptyDataDecls   
--}
-share [mkPersist sqlSettings, mkMigrate "migrateAll"] [persistLowerCase|
-Telemetry
-    serverTime String -- Int?
-    consoleType Int
-    systemVer Int
-    productCode Int
-    productSubCode Int
-    idu Bool
-    logConfVer String
-    timestamp String -- Int?
-    clockType Int
-    uniqueId String
-    p1 String
-    p2 String
-    p3 String
-    p4 String
-    p5 String
-    p6 String
-    p7 String
-    p8 String
-    p9 String
-    p10 String
-    Primary serverTime
-    deriving Show Eq
-|]
 
 dispatch :: [(String, MyArgs -> IO ())]
 dispatch =  [ ("sqlite", to_sqlite)
