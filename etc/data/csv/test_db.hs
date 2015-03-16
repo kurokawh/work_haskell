@@ -16,11 +16,6 @@ import Database.Persist.Sqlite
 import Control.Monad.IO.Class (liftIO)
 import YesodPerson
     
-data Salary = Salary {
-      name :: String
-    , salary :: Int
-}     deriving Show
-
 
 instance FromRecord Person where
     parseRecord v
@@ -34,10 +29,6 @@ instance FromRecord Person where
           where
             n = V.length v
 
---to_sal :: (String, Int) -> Person
-to_sal (x, y) = Person x y
-
-v2v v = V.map to_sal v
 
 -- currently only following command is supported:
 -- % runghc test_db.hs 10.csv
