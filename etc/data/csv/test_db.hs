@@ -29,18 +29,25 @@ instance FromRecord Person where
           where
             n = V.length v
 
-
--- currently only following command is supported:
--- % runghc test_db.hs 10.csv
-main1 :: IO ()
-main1 = do
-    (filename:args) <- getArgs  
+file_to_io :: String -> IO ()
+file_to_io filename = do
     csvData <- BL.readFile filename
     case decode NoHeader csvData of
         Left err -> putStrLn err
         Right v -> main2 v
---          V.mapM_ (putStrLn.show) (v :: (V.Vector Person))
---          putStrLn ""
+
+files_to_io :: [String] -> IO ()
+files_to_io [] = return ()
+files_to_io (x:xs) = do
+  file_to_io x
+  files_to_io xs
+
+-- multiple argument (csv files) are supported
+-- % runghc test_db.hs 10.csv x.csv y.csv ..
+main :: IO ()
+main = do
+  args <- getArgs
+  files_to_io args          
 
 -- copied from YesodPerson.hs.
 main2 :: V.Vector Person -> IO ()
@@ -49,7 +56,3 @@ main2 v = runSqlite "test.db" $ do
     runMigration $ migrate entityDefs $ entityDef (Nothing :: Maybe Person)
     ids <- V.mapM insert v
     liftIO $ print ids
-
-
-main :: IO ()
-main = main1
