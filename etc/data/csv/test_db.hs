@@ -29,6 +29,13 @@ instance FromRecord Person where
           where
             n = V.length v
 
+file_to_vec :: String -> IO (V.Vector Person)
+file_to_vec filename = do
+    csvData <- BL.readFile filename
+    case decode NoHeader csvData of
+        Left err -> return V.empty
+        Right v -> return v
+                
 file_to_io :: String -> IO ()
 file_to_io filename = do
     csvData <- BL.readFile filename
@@ -42,17 +49,25 @@ files_to_io (x:xs) = do
   file_to_io x
   files_to_io xs
 
--- multiple argument (csv files) are supported
--- % runghc test_db.hs 10.csv x.csv y.csv ..
-main :: IO ()
-main = do
-  args <- getArgs
-  files_to_io args          
-
--- copied from YesodPerson.hs.
 main2 :: V.Vector Person -> IO ()
 main2 v = runSqlite "test.db" $ do
     -- this line added: that's it!
     runMigration $ migrate entityDefs $ entityDef (Nothing :: Maybe Person)
     ids <- V.mapM insert v
     liftIO $ print ids
+
+main1 :: IO ()
+main1 = do
+  args <- getArgs
+  files_to_io args          
+
+-- multiple argument (csv files) are supported
+-- % runghc test_db.hs 10.csv x.csv y.csv ..
+main :: IO ()
+main = do
+  args <- getArgs
+  vlist <- mapM file_to_vec args
+  runSqlite "x.db" $ do
+         runMigration $ migrate entityDefs $ entityDef (Nothing :: Maybe Person)
+         ids <- mapM (V.mapM insert) vlist
+         liftIO $ print ids
