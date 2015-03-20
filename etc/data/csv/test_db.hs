@@ -16,19 +16,11 @@ import Database.Persist.Sqlite
 import Control.Monad.IO.Class (liftIO)
 import YesodPerson
 
-import System.IO
-
 
 file_to_vec :: String -> IO (V.Vector Person)
 file_to_vec filename = do
-    putStrLn "call openFile"
-    h <- openFile filename ReadMode
-    putStrLn "ret openFile"
-    hClose h
-    --putStrLn "ret hGetContents"
-    putStrLn ("call ReadFile" ++ filename)
+    putStrLn ("parsing : " ++ filename)
     csvData <- BL.readFile filename
-    putStrLn "ret ReadFile"
     case decode NoHeader csvData of
         Left err -> do
           putStrLn err
@@ -48,3 +40,4 @@ main = do
          runMigration $ migrate entityDefs $ entityDef (Nothing :: Maybe Person)
          ids <- mapM (V.mapM insert) vlist
          liftIO $ print ids
+  putStrLn "succeed."

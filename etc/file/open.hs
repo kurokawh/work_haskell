@@ -1,3 +1,6 @@
+{-# LANGUAGE OverloadedStrings          #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+
 import System.Environment   
 import System.IO
 
@@ -6,6 +9,10 @@ import Data.Csv
 import qualified Data.ByteString.Lazy as BL
 import Control.Applicative (Alternative, Applicative, (<*>), (<$>), (<|>),
                             (<*), (*>), empty, pure)
+
+--import Database.Persist
+--import Database.Persist.Sqlite
+
 
 data Person = Person { 
       name :: !String, age :: !Int 
