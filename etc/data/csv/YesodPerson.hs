@@ -12,6 +12,7 @@ module YesodPerson
 , entityDefs
 , entityKey
 , entityDB
+, parseRecord
 ) where
 -- module yesod_person -- ERROR!!! module name must start with capital.
 
@@ -20,6 +21,12 @@ import Database.Persist.Sqlite
 import Database.Persist.TH
 import Control.Monad.IO.Class (liftIO)
 import Data.Time
+    
+import Control.Monad (MonadPlus, mplus, mzero)
+import Control.Applicative (Alternative, Applicative, (<*>), (<$>), (<|>),
+                            (<*), (*>), empty, pure)
+import qualified Data.Vector as V
+import Data.Csv
 
 share [mkPersist sqlSettings, mkSave "entityDefs"] [persistLowerCase|
 Person
@@ -28,6 +35,18 @@ Person
     deriving Show
 |]
 
+instance FromRecord Person where
+    parseRecord v
+        | n == 10 = Person <$>
+                          v .! 0 <*>
+                          v .! 1
+        | n >= 11 = Person <$>
+                          v .! 9 <*>
+                          v .! 10
+        | otherwise     = mzero
+          where
+            n = V.length v
+  
 main :: IO ()
 main = runSqlite ":memory:" $ do
     -- this line added: that's it!
