@@ -45,7 +45,7 @@ type Row9  = (String,
               String, 
               String)
 
-type Row10 = (String, 
+type Row11 = (String, 
               String, 
               String, 
               String, 
@@ -97,6 +97,6 @@ main = do
 --          V.mapM_ (putStrLn.show) (v2v v)
 --          V.mapM_ (putStrLn.show) (v :: (V.Vector (String, Int)))
 --          V.mapM_ (putStrLn.show) (v :: (V.Vector (String, String)))
-          V.mapM_ (putStrLn.show) (v :: (V.Vector Row10))
+          V.mapM_ (putStrLn.show) (v :: (V.Vector Row11))
 --          V.mapM_ (putStrLn.show) (v :: (V.Vector Row9))
           putStrLn ""
