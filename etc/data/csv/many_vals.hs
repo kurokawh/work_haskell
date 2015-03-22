@@ -11,48 +11,44 @@ import Control.Applicative (Alternative, Applicative, (<*>), (<$>), (<|>),
                             (<*), (*>), empty, pure)
 
 data Salary = Salary {
-      name :: String
-    , salary :: Int
+      s1 :: String
+    , s2 :: String
+    , s3 :: String
+    , s4 :: String
+    , s5 :: String
+    , s6 :: String
+    , s7 :: String
+    , s8 :: String
+    , s9 :: String
+    , s10 :: String
+    , s11 :: String
+    , s12 :: String
+    , s13 :: String
+    , s14 :: String
+    , s15 :: String
 }     deriving Show
 instance FromRecord Salary where
     parseRecord v
-        | n >= 10 = Salary <$>
+        | n >= 15 = Salary <$>
+                          v .! 0 <*>
+                          v .! 1 <*>
+                          v .! 2 <*>
+                          v .! 3 <*>
+                          v .! 4 <*>
+                          v .! 5 <*>
+                          v .! 6 <*>
+                          v .! 7 <*>
                           v .! 8 <*>
-                          v .! 9
+                          v .! 9 <*>
+                          v .! 10 <*>
+                          v .! 11 <*>
+                          v .! 12 <*>
+                          v .! 13 <*>
+                          v .! 14
         | otherwise     = mzero
           where
             n = V.length v
 
-type Row20 = (String, 
-              String, 
-              String, 
-              String, 
-              String, 
-              String, 
-              String, 
-              String, 
-              String, 
-              String, 
-              String, 
-              String, 
-              String, 
-              String, 
-              String, 
-              String, 
-              String, 
-              String, 
-              String, 
-              String)
-
-type Row9  = (String, 
-              String, 
-              String, 
-              String, 
-              String, 
-              String, 
-              String, 
-              String, 
-              String)
 
 type Row11 = (String, 
               String, 
@@ -70,9 +66,9 @@ type Row11 = (String,
 
 instance (FromField a, FromField b, FromField c, FromField d, FromField e,
           FromField f, FromField g, FromField h, FromField i, FromField j,
-          FromField v) =>
---          Record v) =>
-         FromRecord (a, b, c, d, e, f, g, h, i, j, v) where
+          FromField k) =>
+--          Record k) =>
+         FromRecord (a, b, c, d, e, f, g, h, i, j, k) where
     parseRecord v
         | n >= 10  = (,,,,,,,,,,) <$> unsafeIndex v 0
                                  <*> unsafeIndex v 1
@@ -85,7 +81,7 @@ instance (FromField a, FromField b, FromField c, FromField d, FromField e,
                                  <*> unsafeIndex v 8
                                  <*> unsafeIndex v 9
                                  <*> unsafeIndex v 0
---                                 <*> v
+--                                 <*> k
 --        | otherwise = lengthMismatch 10 v
 --        | otherwise = (Fail "a" "b") --Done [Left "x"] 
           where
