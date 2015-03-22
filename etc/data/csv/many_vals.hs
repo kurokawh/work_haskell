@@ -6,6 +6,7 @@ import Data.Csv
 import qualified Data.Vector as V
 
 --import Data.Csv.Incremental ( Parser(..) )
+import Control.Monad (MonadPlus, mplus, mzero)
 import Control.Applicative (Alternative, Applicative, (<*>), (<$>), (<|>),
                             (<*), (*>), empty, pure)
 
@@ -13,6 +14,14 @@ data Salary = Salary {
       name :: String
     , salary :: Int
 }     deriving Show
+instance FromRecord Salary where
+    parseRecord v
+        | n >= 10 = Salary <$>
+                          v .! 8 <*>
+                          v .! 9
+        | otherwise     = mzero
+          where
+            n = V.length v
 
 type Row20 = (String, 
               String, 
@@ -94,9 +103,6 @@ main = do
     case decode NoHeader csvData of
         Left err -> putStrLn err
         Right v -> do
---          V.mapM_ (putStrLn.show) (v2v v)
---          V.mapM_ (putStrLn.show) (v :: (V.Vector (String, Int)))
---          V.mapM_ (putStrLn.show) (v :: (V.Vector (String, String)))
-          V.mapM_ (putStrLn.show) (v :: (V.Vector Row11))
---          V.mapM_ (putStrLn.show) (v :: (V.Vector Row9))
+--          V.mapM_ (putStrLn.show) (v :: (V.Vector Row11))
+          V.mapM_ (putStrLn.show) (v :: (V.Vector Salary))
           putStrLn ""
