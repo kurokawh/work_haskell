@@ -7,6 +7,8 @@
 {-# LANGUAGE QuasiQuotes                #-}
 {-# LANGUAGE TemplateHaskell            #-}
 {-# LANGUAGE TypeFamilies               #-}
+{-# LANGUAGE FlexibleInstances               #-}
+{-# LANGUAGE TypeSynonymInstances            #-}
 module YesodPerson
 ( Person(..)
 , entityDefs
