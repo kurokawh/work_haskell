@@ -96,10 +96,6 @@ instance (FromField a, FromField b, FromField c, FromField d, FromField e,
           where
             n = V.length v
 
---to_sal :: (String, Int) -> Salary
-to_sal (x, y) = Salary x y
-
-v2v v = V.map to_sal v
 
 main :: IO ()
 main = do

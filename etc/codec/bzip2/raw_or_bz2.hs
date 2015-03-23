@@ -59,14 +59,27 @@ instance FromRecord Salary where
             n = V.length v
 
 
+file_to_vec :: String -> IO (V.Vector Salary)
+file_to_vec filename = do
+    putStrLn ("parsing : " ++ filename)
+    csvData <- BL.readFile filename
+    case decode NoHeader csvData of
+        Left err -> do
+          putStrLn err
+          error err
+        Right v -> do
+          --putStrLn ("OK!" ++ (show (V.length v)))
+          V.mapM_ (putStrLn.show) v
+          return v
 
 -- copied from etc/data/csv/many_vals.hs to parse raw csv or bzip2
 main :: IO ()
 main = do
-    (filename:args) <- getArgs  
-    csvData <- BL.readFile filename
-    case decode NoHeader csvData of
-        Left err -> putStrLn err
-        Right v -> do
-          V.mapM_ (putStrLn.show) (v :: (V.Vector Salary))
-          putStrLn ""
+    putStrLn "start"
+    args <- getArgs
+    vlist <- mapM file_to_vec args
+    --let x = map V.length vlist --OK
+    --let x = map (V.mapM_ (putStrLn.show)) vlist
+    --V.mapM_ putStrLn.show vlist
+    --putStrLn (show (length x))
+    return ()
