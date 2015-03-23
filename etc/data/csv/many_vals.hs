@@ -10,6 +10,12 @@ import Control.Monad (MonadPlus, mplus, mzero)
 import Control.Applicative (Alternative, Applicative, (<*>), (<$>), (<|>),
                             (<*), (*>), empty, pure)
 
+-- return index val or return "" if index is too big.
+--getval_or_empty :: Record -> Int -> String
+getval_or_empty v i
+    | i < V.length v = v .! i
+    | otherwise      = return ""
+
 data Salary = Salary {
       s1 :: String
     , s2 :: String
@@ -29,9 +35,11 @@ data Salary = Salary {
 }     deriving Show
 instance FromRecord Salary where
     parseRecord v
-        | n <= 14 = return (Salary "" "" "" "" "" "" "" "" "" "" "" "" "" "" "")
+--        | n <= 14 = return (Salary "" "" "" "" "" "" "" "" "" "" "" "" "" "" (getval_or_empty v 9))
         | n >= 15 = Salary <$>
-                          v .! 0 <*>
+--                          v .! 0 <*>
+                          (getval_or_empty v 1) <*>  -- (v .! 1) for 100.
+--                          (getval_or_empty v 100) <*>  -- "" for 100.
                           v .! 1 <*>
                           v .! 2 <*>
                           v .! 3 <*>
