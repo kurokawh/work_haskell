@@ -29,6 +29,7 @@ data Salary = Salary {
 }     deriving Show
 instance FromRecord Salary where
     parseRecord v
+        | n <= 14 = return (Salary "" "" "" "" "" "" "" "" "" "" "" "" "" "" "")
         | n >= 15 = Salary <$>
                           v .! 0 <*>
                           v .! 1 <*>
