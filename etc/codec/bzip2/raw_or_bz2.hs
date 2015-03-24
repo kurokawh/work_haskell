@@ -59,51 +59,27 @@ instance FromRecord Salary where
             n = V.length v
 
 
-type Row11 = (String, 
-              String, 
-              String, 
-              String, 
-              String, 
-              String, 
-              String, 
-              String, 
-              String, 
-              String,
-              String)
---              Record)
---              Parser v)
-
-instance (FromField a, FromField b, FromField c, FromField d, FromField e,
-          FromField f, FromField g, FromField h, FromField i, FromField j,
-          FromField k) =>
---          Record k) =>
-         FromRecord (a, b, c, d, e, f, g, h, i, j, k) where
-    parseRecord v
-        | n >= 10  = (,,,,,,,,,,) <$> unsafeIndex v 0
-                                 <*> unsafeIndex v 1
-                                 <*> unsafeIndex v 2
-                                 <*> unsafeIndex v 3
-                                 <*> unsafeIndex v 4
-                                 <*> unsafeIndex v 5
-                                 <*> unsafeIndex v 6
-                                 <*> unsafeIndex v 7
-                                 <*> unsafeIndex v 8
-                                 <*> unsafeIndex v 9
-                                 <*> unsafeIndex v 0
---                                 <*> k
---        | otherwise = lengthMismatch 10 v
---        | otherwise = (Fail "a" "b") --Done [Left "x"] 
-          where
-            n = V.length v
-
-
-main :: IO ()
-main = do
-    (filename:args) <- getArgs  
+file_to_vec :: String -> IO (V.Vector Salary)
+file_to_vec filename = do
+    putStrLn ("parsing : " ++ filename)
     csvData <- BL.readFile filename
     case decode NoHeader csvData of
-        Left err -> putStrLn err
+        Left err -> do
+          putStrLn err
+          error err
         Right v -> do
---          V.mapM_ (putStrLn.show) (v :: (V.Vector Row11))
-          V.mapM_ (putStrLn.show) (v :: (V.Vector Salary))
-          putStrLn ""
+          --putStrLn ("OK!" ++ (show (V.length v)))
+          V.mapM_ (putStrLn.show) v
+          return v
+
+-- copied from etc/data/csv/many_vals.hs to parse raw csv or bzip2
+main :: IO ()
+main = do
+    putStrLn "start"
+    args <- getArgs
+    vlist <- mapM file_to_vec args
+    --let x = map V.length vlist --OK
+    --let x = map (V.mapM_ (putStrLn.show)) vlist
+    --V.mapM_ putStrLn.show vlist
+    --putStrLn (show (length x))
+    return ()
