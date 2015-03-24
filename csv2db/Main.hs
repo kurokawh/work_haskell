@@ -5,6 +5,7 @@ import qualified Data.ByteString.Lazy as BL
 import Data.Text (pack)
 import qualified Data.Vector as V
 import qualified Data.Csv as C
+import Data.Char (ord)
 import Database.Persist
 import Database.Persist.Sqlite
 
@@ -29,13 +30,16 @@ to_sqlite args vlist = runSqlite (pack $ targetdb args) $ do
   return ()
 
 
-
+decodeOpt :: C.DecodeOptions
+decodeOpt = C.defaultDecodeOptions {
+              C.decDelimiter = fromIntegral (ord '\t')
+            }
 
 file_to_vec :: String -> IO (V.Vector Telemetry)
 file_to_vec filename = do
     putStrLn ("parsing : " ++ filename)
     csvData <- BL.readFile filename
-    case C.decode C.NoHeader csvData of
+    case C.decodeWith decodeOpt C.NoHeader csvData of
         Left err -> do
           putStrLn err
           error err
