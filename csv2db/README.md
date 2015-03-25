@@ -28,3 +28,14 @@ arguments:
 explanation:
 -----
 TBD
+
+
+ToDo:
+----
+* bz2 support
+* directory (recursive) support
+* schema operation
+  - column name
+  - convert hex (no 0x) to int
+  - enum conversion
+* switch csv & tsv (TAB separated)  

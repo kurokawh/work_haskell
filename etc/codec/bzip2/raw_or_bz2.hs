@@ -4,11 +4,14 @@ import System.Environment
 import qualified Data.ByteString.Lazy as BL
 import Data.Csv
 import qualified Data.Vector as V
+import qualified Data.List as L
 
 --import Data.Csv.Incremental ( Parser(..) )
 import Control.Monad (MonadPlus, mplus, mzero)
 import Control.Applicative (Alternative, Applicative, (<*>), (<$>), (<|>),
                             (<*), (*>), empty, pure)
+
+import qualified Codec.Compression.BZip as BZ
 
 -- return index val or return "" if index is too big.
 --getval_or_empty :: Record -> Int -> String
@@ -58,11 +61,20 @@ instance FromRecord Salary where
           where
             n = V.length v
 
+-- if given file is bz2 then decompress, otherwise returan raw data
+file_to_bs :: String -> IO BL.ByteString
+file_to_bs filename =
+  if L.isSuffixOf ".bz2" filename
+  then do
+    bzData <- BL.readFile filename
+    return (BZ.decompress bzData)
+  else do
+    BL.readFile filename
 
 file_to_vec :: String -> IO (V.Vector Salary)
 file_to_vec filename = do
     putStrLn ("parsing : " ++ filename)
-    csvData <- BL.readFile filename
+    csvData <- file_to_bs filename
     case decode NoHeader csvData of
         Left err -> do
           putStrLn err
