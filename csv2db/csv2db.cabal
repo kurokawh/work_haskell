@@ -25,6 +25,7 @@ executable csv2db
                      , text
                      , vector
                      , cassava
+                     , bzlib
                      , persistent-template
                      , persistent >= 2.0
                      , persistent-sqlite >= 2.0

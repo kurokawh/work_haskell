@@ -5,9 +5,11 @@ import qualified Data.ByteString.Lazy as BL
 import Data.Text (pack)
 import qualified Data.Vector as V
 import qualified Data.Csv as C
+import qualified Data.List as L
 import Data.Char (ord)
 import Database.Persist
 import Database.Persist.Sqlite
+import qualified Codec.Compression.BZip as BZ
 
 import MyArgs
 import Telemetry
@@ -35,10 +37,20 @@ decodeOpt = C.defaultDecodeOptions {
               C.decDelimiter = fromIntegral (ord '\t')
             }
 
+-- if given file is bz2 then decompress, otherwise returan raw data
+file_to_bs :: String -> IO BL.ByteString
+file_to_bs filename =
+    if L.isSuffixOf ".bz2" filename
+    then do
+      bzData <- BL.readFile filename
+      return (BZ.decompress bzData)
+    else do
+      BL.readFile filename
+
 file_to_vec :: String -> IO (V.Vector Telemetry)
 file_to_vec filename = do
     putStrLn ("parsing : " ++ filename)
-    csvData <- BL.readFile filename
+    csvData <- file_to_bs filename
     case C.decodeWith decodeOpt C.NoHeader csvData of
         Left err -> do
           putStrLn err
