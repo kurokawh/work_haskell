@@ -1,0 +1,21 @@
+diff -Naur org/bzlib-0.5.0.5/cbits/bzlib.c fixed/bzlib-0.5.0.5/cbits/bzlib.c
+--- org/bzlib-0.5.0.5/cbits/bzlib.c	2015-01-26 01:52:01.000000000 +0900
++++ fixed/bzlib-0.5.0.5/cbits/bzlib.c	2015-03-25 18:43:01.208547500 +0900
+@@ -1372,7 +1372,7 @@
+ #ifndef BZ_NO_STDIO
+ /*---------------------------------------------------*/
+ 
+-#if defined(_WIN32) || defined(OS2) || defined(MSDOS)
++#if 0 //defined(_WIN32) || defined(OS2) || defined(MSDOS)
+ #   include <fcntl.h>
+ #   include <io.h>
+ #   define SET_BINARY_MODE(file) setmode(fileno(file),O_BINARY)
+@@ -1425,7 +1425,7 @@
+         fp = fopen(path,mode2);
+       }
+    } else {
+-#ifdef BZ_STRICT_ANSI
++#if 1 //def BZ_STRICT_ANSI
+       fp = NULL;
+ #else
+       fp = fdopen(fd,mode2);
