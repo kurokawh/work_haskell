@@ -15,29 +15,34 @@ import System.FilePath.Posix
 -- iterate all entries in given dir
 -- if file, show info
 -- if dir, call iterate_dir recursively.
-iterate_dir :: [Char] -> IO ()
+iterate_dir :: FilePath -> IO ()
 iterate_dir dir = do
+--  if dir == ".." then return ()
   putStrLn ("[d]: " ++ dir)
   entries <- getDirectoryContents dir
   -- putStrLn $ show entries
-  mapM operate_file_or_dir entries
+  mapM (operate_file_or_dir.((</>) dir))  entries
   return ()
 
-operate_file :: [Char] -> IO ()
+operate_file :: FilePath -> IO ()
 operate_file file = do
   putStrLn ("[f]: " ++ file)
 
-operate_file_or_dir :: [Char] -> IO ()
-operate_file_or_dir entry = do
-  result <- doesDirectoryExist entry
-  if result then
-      iterate_dir entry
-  else
-      operate_file entry
-
+operate_file_or_dir :: FilePath -> IO ()
+operate_file_or_dir entry -- abs_entry
+  | entry == "." = return ()  -- ignore current dir
+  | entry == ".." = return () -- ignore parent dir
+  | otherwise = do
+      result <- doesDirectoryExist entry
+      if result then
+          iterate_dir entry
+      else
+          operate_file entry
+--  where
+--    entry = takeFileName abs_entry
 
 -- def for sample --
-gives :: [Char]
+gives :: FilePath
 gives = "/root/directory/xxx.file.ext"
 
 sample = do
