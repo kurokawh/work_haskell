@@ -19,11 +19,24 @@ iterate_dir :: [Char] -> IO ()
 iterate_dir dir = do
   putStrLn ("[d]: " ++ dir)
   entries <- getDirectoryContents dir
-  putStrLn $ show entries
-  -- XXX: not implemented yet.
+  -- putStrLn $ show entries
+  mapM operate_file_or_dir entries
   return ()
 
+operate_file :: [Char] -> IO ()
+operate_file file = do
+  putStrLn ("[f]: " ++ file)
 
+operate_file_or_dir :: [Char] -> IO ()
+operate_file_or_dir entry = do
+  result <- doesDirectoryExist entry
+  if result then
+      iterate_dir entry
+  else
+      operate_file entry
+
+
+-- def for sample --
 gives :: [Char]
 gives = "/root/directory/xxx.file.ext"
 
