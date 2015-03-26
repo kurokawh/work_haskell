@@ -14,32 +14,45 @@ import System.FilePath.Posix
 
 -- iterate all entries in given dir
 -- if file, show info
--- if dir, call iterate_dir recursively.
-iterate_dir :: FilePath -> IO ()
-iterate_dir dir = do
---  if dir == ".." then return ()
-  putStrLn ("[d]: " ++ dir)
-  entries <- getDirectoryContents dir
-  -- putStrLn $ show entries
-  mapM (operate_file_or_dir.((</>) dir))  entries
-  return ()
+-- if dir, call operate_dir recursively.
+operate_dir :: FilePath -> IO ()
+operate_dir dir = do
+  putStrLn $ "operate_dir dir: " ++ dir
+  if (takeFileName dir) == ".." then do
+    putStrLn "\tskip"
+    return () -- skip parent dir
+  else do
+    putStrLn ("[d]: " ++ dir)
+    entries <- getDirectoryContents dir
+    putStrLn $ show entries
+    mapM (operate_abspath.((</>) dir))  entries
+    return ()
 
 operate_file :: FilePath -> IO ()
 operate_file file = do
-  putStrLn ("[f]: " ++ file)
+  putStrLn $ "operate_file file: " ++ file
+  if (takeFileName file) == "." then do
+    putStrLn "\tskip"
+    return () -- skip current dir
+  else
+    putStrLn ("[f]: " ++ file)
 
 operate_file_or_dir :: FilePath -> IO ()
-operate_file_or_dir entry -- abs_entry
-  | entry == "." = return ()  -- ignore current dir
-  | entry == ".." = return () -- ignore parent dir
-  | otherwise = do
-      result <- doesDirectoryExist entry
-      if result then
-          iterate_dir entry
-      else
-          operate_file entry
---  where
---    entry = takeFileName abs_entry
+operate_file_or_dir entry = do
+  isdir <- doesDirectoryExist entry
+  if isdir then
+    operate_dir entry
+  else
+    operate_file entry
+      
+
+operate_abspath :: FilePath -> IO ()
+operate_abspath abspath
+  | entry == ".." = return ()
+  | entry == "." = return ()
+  | otherwise = operate_file_or_dir abspath
+  where
+    entry = takeFileName abspath
 
 -- def for sample --
 gives :: FilePath
@@ -63,5 +76,5 @@ main = do
     putStrLn "start"
     sample
     (dir:xs) <- getArgs
-    iterate_dir dir
+    operate_dir dir
     
