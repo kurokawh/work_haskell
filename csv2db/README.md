@@ -38,7 +38,6 @@ TBD
 
 ToDo:
 ----
-* bz2 support
 * directory (recursive) support
 * schema operation
   - column name

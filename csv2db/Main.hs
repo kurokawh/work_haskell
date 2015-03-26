@@ -1,5 +1,6 @@
 {-# LANGUAGE MultiParamTypeClasses      #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
+import System.FilePath as FP
 import System.Console.CmdArgs
 import qualified Data.ByteString.Lazy as BL
 import Data.Text (pack)
@@ -40,7 +41,7 @@ decodeOpt = C.defaultDecodeOptions {
 -- if given file is bz2 then decompress, otherwise returan raw data
 file_to_bs :: String -> IO BL.ByteString
 file_to_bs filename =
-    if L.isSuffixOf ".bz2" filename
+    if (FP.takeExtension filename) == ".bz2"
     then do
       bzData <- BL.readFile filename
       return (BZ.decompress bzData)
