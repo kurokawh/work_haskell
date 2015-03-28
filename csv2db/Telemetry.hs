@@ -1,9 +1,13 @@
+{-# LANGUAGE FlexibleContexts           #-}
 {-# LANGUAGE GADTs             #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE MultiParamTypeClasses      #-}
+{-# LANGUAGE OverloadedStrings          #-}
 {-# LANGUAGE QuasiQuotes       #-}
 {-# LANGUAGE TemplateHaskell   #-}
 {-# LANGUAGE TypeFamilies      #-}
-{-# LANGUAGE MultiParamTypeClasses      #-}
-{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE TypeSynonymInstances       #-}
+{-# LANGUAGE FlexibleInstances          #-}
 module Telemetry
     ( Telemetry(..)
     , migrateAll

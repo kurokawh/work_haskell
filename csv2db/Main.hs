@@ -61,12 +61,17 @@ file_to_vec filename = do
 
 arg_to_vlist :: MyArgs -> IO [V.Vector Telemetry]
 arg_to_vlist args = do
-  vlist <- mapM file_to_vec (csvfiles args)
-  return vlist
+  flist <- mapM file_to_vec (csvfiles args)
+  rfiles <- recursive_files args
+  rlist <- mapM file_to_vec rfiles
+  return (flist ++ rlist)
 
 main = do
   args <- cmdArgs config
   let (Just to_db) = lookup (dbopt　args) dispatch
   vlist <- arg_to_vlist args
-  -- print args
-  to_db args vlist
+  if length vlist == 0 
+  then
+      print args
+  else
+      to_db args vlist
