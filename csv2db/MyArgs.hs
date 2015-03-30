@@ -45,7 +45,11 @@ config = MyArgs {
 
 
 recursive_files :: MyArgs -> IO [String]
-recursive_files args = operate_dir $ recursive args
+recursive_files args
+  | dir == "" = return [] -- recursive option is not set
+  | otherwise = operate_dir dir
+  where
+    dir = recursive args
 
 operate_dir :: FilePath -> IO ([String])
 operate_dir dir = do

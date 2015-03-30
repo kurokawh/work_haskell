@@ -23,16 +23,16 @@ import Database.Persist.TH
 share [mkPersist sqlSettings, mkMigrate "migrateAll"] [persistLowerCase|
 Telemetry
     serverTime String -- Int? -- index: 0
-    consoleType Int
+    consoleType Int -- index: 3
     systemVer Int
     productCode Int
     productSubCode Int
-    idu Int --Bool -- index: 5
+    idu Int --Bool
     logConfVer String
     timestamp String -- Int?
     clockType Int
-    uniqueId String -- index: 9
-    p1 String
+    uniqueId String -- index: 11
+    p1 String -- index: 29
     p2 String
     p3 String
     p4 String
@@ -59,8 +59,8 @@ Telemetry
 instance FromRecord Telemetry where
     parseRecord v = Telemetry <$>
                           v .! 0 <*>
-                          v .! 1 <*>
-                          v .! 2 <*>
+--                          v .! 1 <*>
+--                          v .! 2 <*>
                           v .! 3 <*>
                           v .! 4 <*>
                           v .! 5 <*>
@@ -70,24 +70,26 @@ instance FromRecord Telemetry where
                           v .! 9 <*>
                           v .! 10 <*>
                           v .! 11 <*>
-                          (getval_or_empty v 12) <*>
-                          (getval_or_empty v 13) <*>
-                          (getval_or_empty v 14) <*>
-                          (getval_or_empty v 15) <*>
-                          (getval_or_empty v 16) <*>
-                          (getval_or_empty v 17) <*>
-                          (getval_or_empty v 18) <*>
-                          (getval_or_empty v 19) <*>
-                          (getval_or_empty v 20) <*>
-                          (getval_or_empty v 21) <*>
-                          (getval_or_empty v 22) <*>
-                          (getval_or_empty v 23) <*>
-                          (getval_or_empty v 24) <*>
-                          (getval_or_empty v 25) <*>
-                          (getval_or_empty v 26) <*>
-                          (getval_or_empty v 27) <*>
-                          (getval_or_empty v 28) <*>
-                          (getval_or_empty v 29)
+                          (getval_or_empty v 29) <*>
+                          (getval_or_empty v 30) <*>
+                          (getval_or_empty v 31) <*>
+                          (getval_or_empty v 32) <*>
+                          (getval_or_empty v 33) <*>
+                          (getval_or_empty v 34) <*>
+                          (getval_or_empty v 35) <*>
+                          (getval_or_empty v 36) <*>
+                          (getval_or_empty v 37) <*>
+                          (getval_or_empty v 38) <*>
+                          (getval_or_empty v 39) <*>
+                          (getval_or_empty v 40) <*>
+                          (getval_or_empty v 41) <*>
+                          (getval_or_empty v 42) <*>
+                          (getval_or_empty v 43) <*>
+                          (getval_or_empty v 44) <*>
+                          (getval_or_empty v 45) <*>
+                          (getval_or_empty v 46) <*>
+                          (getval_or_empty v 47) <*>
+                          (getval_or_empty v 48)
 
 -- return index val or return "" if index is too big.
 --getval_or_empty :: Record -> Int -> String
