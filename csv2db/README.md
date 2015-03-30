@@ -38,12 +38,12 @@ TBD
 
 ToDo:
 ----
-* bz2 support
-* directory (recursive) support
 * schema operation
   - column name
   - convert hex (no 0x) to int
   - enum conversion
+  - create index for specified column(s)
+* support specified telemetry (specify with command option).
 * switch csv & tsv (TAB separated)  
 
 
