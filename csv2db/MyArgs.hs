@@ -7,8 +7,11 @@ module MyArgs
 , schema
 , targetdb
 , csvfiles
+, recursive_files
 ) where
 
+import System.Directory
+import System.FilePath
 import System.Console.CmdArgs
 
 data MyArgs = MyArgs {
@@ -38,3 +41,52 @@ config = MyArgs {
     , targetdb  = def &= typ "TARGET_DB" &= argPos 0 -- &= help help_targetdb
     , csvfiles = def &= typ "CSV_FILES" &= args -- &= help help_csvfiles
 } &= program "csv2db" &= help help_program
+
+
+
+recursive_files :: MyArgs -> IO [String]
+recursive_files args
+  | dir == "" = return [] -- recursive option is not set
+  | otherwise = operate_dir dir
+  where
+    dir = recursive args
+
+operate_dir :: FilePath -> IO ([String])
+operate_dir dir = do
+  putStrLn $ "operate_dir dir: " ++ dir
+  if (takeFileName dir) == ".." then do
+    putStrLn "\tskip"
+    return [] -- skip parent dir
+  else do
+    putStrLn ("[d]: " ++ dir)
+    entries <- getDirectoryContents dir
+    putStrLn $ "\toperate_dir: entries: " ++ (show entries)
+    filell <- mapM (operate_abspath.((</>) dir))  entries
+    putStrLn $ "\toperate_dir: fll: " ++ show filell
+    return $ concat filell
+
+operate_file :: FilePath -> IO ([String])
+operate_file file = do
+  putStrLn $ "operate_file file: " ++ file
+  if (takeFileName file) == "." then do
+    putStrLn "\tskip"
+    return [] -- skip current dir
+  else do
+    putStrLn ("[f]: " ++ file)
+    return [file]
+
+operate_file_or_dir :: FilePath -> IO ([String])
+operate_file_or_dir entry = do
+  isdir <- doesDirectoryExist entry
+  if isdir then
+    operate_dir entry
+  else
+    operate_file entry
+
+operate_abspath :: FilePath -> IO ([String])
+operate_abspath abspath
+  | entry == ".." = return []
+  | entry == "." = return []
+  | otherwise = operate_file_or_dir abspath
+  where
+    entry = takeFileName abspath

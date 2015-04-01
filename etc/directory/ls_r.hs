@@ -15,29 +15,31 @@ import System.FilePath.Posix
 -- iterate all entries in given dir
 -- if file, show info
 -- if dir, call operate_dir recursively.
-operate_dir :: FilePath -> IO ()
+operate_dir :: FilePath -> IO ([String])
 operate_dir dir = do
   putStrLn $ "operate_dir dir: " ++ dir
   if (takeFileName dir) == ".." then do
     putStrLn "\tskip"
-    return () -- skip parent dir
+    return [] -- skip parent dir
   else do
     putStrLn ("[d]: " ++ dir)
     entries <- getDirectoryContents dir
-    putStrLn $ show entries
-    mapM (operate_abspath.((</>) dir))  entries
-    return ()
+    putStrLn $ "\toperate_dir: entries: " ++ (show entries)
+    filell <- mapM (operate_abspath.((</>) dir))  entries
+    putStrLn $ "\toperate_dir: fll: " ++ show filell
+    return $ concat filell
 
-operate_file :: FilePath -> IO ()
+operate_file :: FilePath -> IO ([String])
 operate_file file = do
   putStrLn $ "operate_file file: " ++ file
   if (takeFileName file) == "." then do
     putStrLn "\tskip"
-    return () -- skip current dir
-  else
+    return [] -- skip current dir
+  else do
     putStrLn ("[f]: " ++ file)
+    return [file]
 
-operate_file_or_dir :: FilePath -> IO ()
+operate_file_or_dir :: FilePath -> IO ([String])
 operate_file_or_dir entry = do
   isdir <- doesDirectoryExist entry
   if isdir then
@@ -46,10 +48,10 @@ operate_file_or_dir entry = do
     operate_file entry
       
 
-operate_abspath :: FilePath -> IO ()
+operate_abspath :: FilePath -> IO ([String])
 operate_abspath abspath
-  | entry == ".." = return ()
-  | entry == "." = return ()
+  | entry == ".." = return []
+  | entry == "." = return []
   | otherwise = operate_file_or_dir abspath
   where
     entry = takeFileName abspath

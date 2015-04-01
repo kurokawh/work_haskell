@@ -48,7 +48,7 @@ file_to_bs filename =
     else do
       BL.readFile filename
 
-file_to_vec :: String -> IO (V.Vector Telemetry)
+file_to_vec :: C.FromRecord a => String -> IO (V.Vector a)
 file_to_vec filename = do
     putStrLn ("parsing : " ++ filename)
     csvData <- file_to_bs filename
@@ -60,14 +60,19 @@ file_to_vec filename = do
           --putStrLn "OK!"
           return v
 
-arg_to_vlist :: MyArgs -> IO [V.Vector Telemetry]
+arg_to_vlist :: C.FromRecord a => MyArgs -> IO [V.Vector a]
 arg_to_vlist args = do
-  vlist <- mapM file_to_vec (csvfiles args)
-  return vlist
+  flist <- mapM file_to_vec (csvfiles args)
+  rfiles <- recursive_files args
+  rlist <- mapM file_to_vec rfiles
+  return (flist ++ rlist)
 
 main = do
   args <- cmdArgs config
   let (Just to_db) = lookup (dbopt　args) dispatch
   vlist <- arg_to_vlist args
-  -- print args
-  to_db args vlist
+  if length vlist == 0 
+  then
+      print args
+  else
+      to_db args (vlist :: [V.Vector Telemetry])
