@@ -10,7 +10,12 @@
 {-# LANGUAGE FlexibleInstances          #-}
 module Telemetry
     ( Telemetry(..)
+    , Telemetry_d12(..)
+    , Telemetry_d13(..)
+    , Telemetry_d29(..)
     , migrateAll
+    , migrateAll_d12
+    , to_d12
     ) where
 
 import Control.Monad (MonadPlus, mplus, mzero)
@@ -20,6 +25,15 @@ import qualified Data.Vector as V
 import Data.Csv
 import Database.Persist.TH
 
+-- return index val or return "" if index is too big.
+--getval_or_empty :: Record -> Int -> String
+getval_or_empty v i
+    | i < V.length v = v .! i
+    | otherwise      = return ""
+
+
+
+-- general schema
 share [mkPersist sqlSettings, mkMigrate "migrateAll"] [persistLowerCase|
 Telemetry
     serverTime String -- Int? -- index: 0
@@ -91,8 +105,73 @@ instance FromRecord Telemetry where
                           (getval_or_empty v 47) <*>
                           (getval_or_empty v 48)
 
--- return index val or return "" if index is too big.
---getval_or_empty :: Record -> Int -> String
-getval_or_empty v i
-    | i < V.length v = v .! i
-    | otherwise      = return ""
+share [mkPersist sqlSettings, mkMigrate "migrateAll_d12"] [persistLowerCase|
+Telemetry_d12
+    serverTime String -- Int? -- index: 0
+    consoleType Int -- index: 3
+    systemVer Int
+    productCode Int
+    productSubCode Int
+    idu Int --Bool
+    logConfVer String
+    timestamp String -- Int?
+    clockType Int
+    uniqueId String -- index: 11
+    xx1 String -- index: 29
+    xx2 String
+    xx3 String
+    xx4 String
+    xx5 String
+    xx6 String
+    xx7 String
+    xx8 String
+    xx9 String
+    xx10 String
+    xx11 String
+    xx12 String
+    xx13 String
+    xx14 String
+    xx15 String
+    xx16 String
+    xx17 String
+    xx18 String
+    xx19 String
+    xx20 String
+    deriving Show Eq
+|]
+    
+to_d12 :: Telemetry -> Telemetry_d12
+to_d12 t = Telemetry_d12
+           (telemetryServerTime t)
+           (telemetryConsoleType t)
+           (telemetrySystemVer t)
+           (telemetryProductCode t)
+           (telemetryProductSubCode t)
+           (telemetryIdu t)
+           (telemetryLogConfVer t)
+           (telemetryTimestamp t)
+           (telemetryClockType t)
+           (telemetryUniqueId t)
+           (telemetryP1 t)
+           (telemetryP2 t)
+           (telemetryP3 t)
+           (telemetryP4 t)
+           (telemetryP5 t)
+           (telemetryP6 t)
+           (telemetryP7 t)
+           (telemetryP8 t)
+           (telemetryP9 t)
+           (telemetryP10 t)
+           (telemetryP11 t)
+           (telemetryP12 t)
+           (telemetryP13 t)
+           (telemetryP14 t)
+           (telemetryP15 t)
+           (telemetryP16 t)
+           (telemetryP17 t)
+           (telemetryP18 t)
+           (telemetryP19 t)
+           (telemetryP20 t)
+
+type Telemetry_d13 = Telemetry_d12
+type Telemetry_d29 = Telemetry_d12

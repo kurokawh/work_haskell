@@ -25,12 +25,19 @@ dispatch =  [ ("sqlite", to_sqlite)
 
 
 -- ToDo remove 2nd argument (vlist).
-to_sqlite args vlist = runSqlite (pack $ targetdb args) $ do
-  runMigration migrateAll
---  mapM insert (files_to_telemetries (csvfiles args))
-  ids <- mapM (V.mapM insert) vlist
---  liftIO $ print ids
-  return ()
+to_sqlite args vlist = runSqlite (pack $ targetdb args) $ 
+  --ids <- mapM (V.mapM insert) vlist
+  case schema args of
+    "d12" -> do
+      runMigration migrateAll_d12
+      mapM (V.mapM insert) vlist
+      return ()
+--    "d13" -> mapM (V.mapM insert) vlist
+--    "d29" -> mapM (V.mapM insert) vlist
+    otherwise -> do
+      runMigration migrateAll
+      mapM (V.mapM insert) vlist
+      return ()
 
 
 decodeOpt :: C.DecodeOptions
