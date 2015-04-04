@@ -10,12 +10,16 @@
 {-# LANGUAGE FlexibleInstances          #-}
 module Telemetry
     ( Telemetry(..)
-    , Telemetry_d12(..)
-    , Telemetry_d13(..)
-    , Telemetry_d29(..)
     , migrateAll
+    , Telemetry_d12(..)
     , migrateAll_d12
     , to_d12
+    , Telemetry_d13(..)
+    , migrateAll_d13
+    , to_d13
+    , Telemetry_d29(..)
+    , migrateAll_d29
+    , to_d29
     ) where
 
 import Control.Monad (MonadPlus, mplus, mzero)
@@ -173,5 +177,59 @@ to_d12 t = Telemetry_d12
            (telemetryP19 t)
            (telemetryP20 t)
 
-type Telemetry_d13 = Telemetry_d12
-type Telemetry_d29 = Telemetry_d12
+share [mkPersist sqlSettings, mkMigrate "migrateAll_d13"] [persistLowerCase|
+Telemetry_d13
+    serverTime String -- Int? -- index: 0
+    consoleType Int -- index: 3
+    systemVer Int
+    productCode Int
+    productSubCode Int
+    idu Int --Bool
+    logConfVer String
+    timestamp String -- Int?
+    clockType Int
+    uniqueId String -- index: 11
+    deriving Show Eq
+|]
+    
+to_d13 :: Telemetry -> Telemetry_d13
+to_d13 t = Telemetry_d13
+           (telemetryServerTime t)
+           (telemetryConsoleType t)
+           (telemetrySystemVer t)
+           (telemetryProductCode t)
+           (telemetryProductSubCode t)
+           (telemetryIdu t)
+           (telemetryLogConfVer t)
+           (telemetryTimestamp t)
+           (telemetryClockType t)
+           (telemetryUniqueId t)
+
+share [mkPersist sqlSettings, mkMigrate "migrateAll_d29"] [persistLowerCase|
+Telemetry_d29
+    serverTime String -- Int? -- index: 0
+    consoleType Int -- index: 3
+    systemVer Int
+    productCode Int
+    productSubCode Int
+    idu Int --Bool
+    logConfVer String
+    timestamp String -- Int?
+    clockType Int
+    uniqueId String -- index: 11
+    deriving Show Eq
+|]
+    
+to_d29 :: Telemetry -> Telemetry_d29
+to_d29 t = Telemetry_d29
+           (telemetryServerTime t)
+           (telemetryConsoleType t)
+           (telemetrySystemVer t)
+           (telemetryProductCode t)
+           (telemetryProductSubCode t)
+           (telemetryIdu t)
+           (telemetryLogConfVer t)
+           (telemetryTimestamp t)
+           (telemetryClockType t)
+           (telemetryUniqueId t)
+

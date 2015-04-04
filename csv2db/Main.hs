@@ -32,13 +32,21 @@ to_sqlite args vlist = runSqlite (pack $ targetdb args) $
       let cvlist =  map (V.map to_d12) vlist
       mapM (V.mapM insert) cvlist
       return ()
---    "d13" -> mapM (V.mapM insert) vlist
---    "d29" -> mapM (V.mapM insert) vlist
-    otherwise -> do
+    "d13" -> do
+      runMigration migrateAll_d13
+      let cvlist =  map (V.map to_d13) vlist
+      mapM (V.mapM insert) cvlist
+      return ()
+    "d29" -> do
+      runMigration migrateAll_d29
+      let cvlist =  map (V.map to_d29) vlist
+      mapM (V.mapM insert) cvlist
+      return ()
+    "normal" -> do
       runMigration migrateAll
       mapM (V.mapM insert) vlist
       return ()
-
+    otherwise -> error "unknown SCHEMA_INDEX."
 
 decodeOpt :: C.DecodeOptions
 decodeOpt = C.defaultDecodeOptions {

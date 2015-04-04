@@ -22,21 +22,21 @@ data MyArgs = MyArgs {
     , csvfiles :: [String]
     } deriving (Data,Typeable,Show)
 
-help_dbopt = "specify db type. default db is 'sqlite'.\n"
-             ++ "'postgresql', 'mysql' & etc. will be supported in the future."
+help_dbopt = "specify DB type. default DB is 'sqlite'.\n"
+             ++ "'postgresql', 'mysql' & etc. may be supported in the future."
 help_schema = "specify table name.\n"
-              ++ "specify field name & field type for each column.\n"
-              ++ "- default filed name: c1, c2, ...\n"
-              ++ "- default field type: VARCHAR."
-help_recursive = "specify directory to iterate all files recursively."
+              ++ "specify predefined schema index such as 'd12', 'd13', etc.\n"
+              ++ "default is 'normal' which stores all values as string.\n"
+help_recursive = "specify directory to iterate all files in it recursively."
 help_targetdb = "specify DB file for sqlite."
 help_csvfiles = "specify one ore more csv files.\n"
 	        ++ "one file must be specified at the minimum."
-help_program = "parse CSV files and store all data into DB."
+help_program = "parse CSV files and store all data into DB.\n"
+               ++ "TARGET_DB is the mandatory argument."
 
 config = MyArgs {
       dbopt   = "sqlite" &= typ "TARGET_DB_TYPE" &= help help_dbopt
-    , schema  = "" &= typ "SCHEMA_DEF_FILE" &= help help_schema
+    , schema  = "normal" &= typ "SCHEMA_INDEX" &= help help_schema
     , recursive = "" &= typ "RECURSIVE_DIR" &= help help_recursive
     , targetdb  = def &= typ "TARGET_DB" &= argPos 0 -- &= help help_targetdb
     , csvfiles = def &= typ "CSV_FILES" &= args -- &= help help_csvfiles
