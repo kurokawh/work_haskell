@@ -26,11 +26,11 @@ dispatch =  [ ("sqlite", to_sqlite)
 
 -- ToDo remove 2nd argument (vlist).
 to_sqlite args vlist = runSqlite (pack $ targetdb args) $ 
-  --ids <- mapM (V.mapM insert) vlist
   case schema args of
     "d12" -> do
       runMigration migrateAll_d12
-      mapM (V.mapM insert) vlist
+      let cvlist =  map (V.map to_d12) vlist
+      mapM (V.mapM insert) cvlist
       return ()
 --    "d13" -> mapM (V.mapM insert) vlist
 --    "d29" -> mapM (V.mapM insert) vlist
