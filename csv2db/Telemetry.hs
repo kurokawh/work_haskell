@@ -22,6 +22,7 @@ module Telemetry
     , to_d29
     ) where
 
+import Numeric
 import Control.Monad (MonadPlus, mplus, mzero)
 import Control.Applicative (Alternative, Applicative,
                             (<*>), (<$>), (<|>), (<*), (*>), empty, pure)
@@ -35,7 +36,10 @@ getval_or_empty v i
     | i < V.length v = v .! i
     | otherwise      = return ""
 
+decstr_to_int decstr = read decstr :: Int
 
+hexstr_to_int hexstr = x
+    where [(x,_)] = readHex hexstr
 
 -- general schema
 share [mkPersist sqlSettings, mkMigrate "migrateAll"] [persistLowerCase|
@@ -189,6 +193,8 @@ Telemetry_d13
     timestamp String -- Int?
     clockType Int
     uniqueId String -- index: 11
+    hexInt Int -- test 1
+    hexVal Int -- test 2
     deriving Show Eq
 |]
     
@@ -204,6 +210,8 @@ to_d13 t = Telemetry_d13
            (telemetryTimestamp t)
            (telemetryClockType t)
            (telemetryUniqueId t)
+           (decstr_to_int $ telemetryP1 t)
+           (hexstr_to_int $ telemetryP1 t)
 
 share [mkPersist sqlSettings, mkMigrate "migrateAll_d29"] [persistLowerCase|
 Telemetry_d29

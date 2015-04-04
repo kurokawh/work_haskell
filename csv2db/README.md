@@ -39,7 +39,6 @@ ToDo:
 ----
 * schema operation
   - column name
-  - convert hex (no 0x) to int
   - enum conversion
 * avoid dupulicated insertion (by checking filename)
 * switch csv & tsv (TAB separated)  
