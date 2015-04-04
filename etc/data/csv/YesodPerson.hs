@@ -56,3 +56,5 @@ main = runSqlite ":memory:" $ do
     michaelId <- insert $ Person "Michael" 26
     michael <- get michaelId
     liftIO $ print michael
+    Just just_michael <- get michaelId
+    liftIO $ putStrLn ("personName: " ++ (personName just_michael))
