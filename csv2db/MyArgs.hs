@@ -43,6 +43,10 @@ config = MyArgs {
 } &= program "csv2db" &= help help_program
 
 
+-- Debug Print: default off
+putStrLnDbg :: String -> IO ()
+--putStrLnDbg s = putStrLn s
+putStrLnDbg s = return ()
 
 recursive_files :: MyArgs -> IO [String]
 recursive_files args
@@ -53,26 +57,26 @@ recursive_files args
 
 operate_dir :: FilePath -> IO ([String])
 operate_dir dir = do
-  putStrLn $ "operate_dir dir: " ++ dir
+  putStrLnDbg $ "operate_dir dir: " ++ dir
   if (takeFileName dir) == ".." then do
-    putStrLn "\tskip"
+    putStrLnDbg "\tskip"
     return [] -- skip parent dir
   else do
-    putStrLn ("[d]: " ++ dir)
+    putStrLnDbg ("[d]: " ++ dir)
     entries <- getDirectoryContents dir
-    putStrLn $ "\toperate_dir: entries: " ++ (show entries)
+    putStrLnDbg $ "\toperate_dir: entries: " ++ (show entries)
     filell <- mapM (operate_abspath.((</>) dir))  entries
-    putStrLn $ "\toperate_dir: fll: " ++ show filell
+    putStrLnDbg $ "\toperate_dir: fll: " ++ show filell
     return $ concat filell
 
 operate_file :: FilePath -> IO ([String])
 operate_file file = do
-  putStrLn $ "operate_file file: " ++ file
+  putStrLnDbg $ "operate_file file: " ++ file
   if (takeFileName file) == "." then do
-    putStrLn "\tskip"
+    putStrLnDbg "\tskip"
     return [] -- skip current dir
   else do
-    putStrLn ("[f]: " ++ file)
+    putStrLnDbg ("[f]: " ++ file)
     return [file]
 
 operate_file_or_dir :: FilePath -> IO ([String])
