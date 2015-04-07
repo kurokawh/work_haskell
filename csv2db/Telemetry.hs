@@ -15,7 +15,7 @@ module Telemetry
     , Telemetry_d12(..)
     , Telemetry_d12Id -- only for avoid warning
     , migrateAll_d12
-    , convert_d12
+    , insert_d12
     , Telemetry_d13(..)
     , Telemetry_d13Id -- only for avoid warning
     , migrateAll_d13
@@ -34,7 +34,6 @@ import Data.Csv
 import Data.String (IsString)
 import Database.Persist
 import Database.Persist.TH
-import Database.Persist.Sqlite (runMigration)
 
 -- return index val or return "" if index is too big.
 getval_or_empty :: (FromField a, Data.String.IsString a) =>
@@ -195,21 +194,6 @@ to_d12 f t = Telemetry_d12
            (telemetryP20 t)
            (f)
 
-{-
-is_parsed :: Control.Monad.IO.Class.MonadIO m =>
-             String ->
-             Control.Monad.Trans.Reader.ReaderT
-                    Database.Persist.Sql.Types.SqlBackend
-                    m
-                    [Entity Telemetry]
--}
---is_parsed f = selectList [TelemetryFilename ==. f] [LimitTo 1]
-
-{-
-convert_d12 :: Control.Monad.IO.Class.MonadIO m =>
-               [(String, V.Vector Telemetry)] ->
-               Control.Monad.Trans.Reader.ReaderT Database.Persist.Sql.Types.SqlBackend m ()
--}
 
 {-
 insert_d12 :: Control.Monad.IO.Class.MonadIO m =>
@@ -222,16 +206,11 @@ insert_d12 (f, v) = do
               then do
                   -- not parsed yet
                   let cv = V.map (to_d12 f) v
-                  --liftIO $ putStrLn ("\tinsert length v: " ++ (show cv)) -- not evaluated without this?
                   V.mapM_ insert cv
               else
                   -- already parsed: do nothing
                   liftIO (putStrLn ("\tskip because already parsed: " ++ f))
   
-convert_d12 vlist = do
-      runMigration migrateAll_d12
-      mapM_ insert_d12 vlist
-
 
 share [mkPersist sqlSettings, mkMigrate "migrateAll_d13"] [persistLowerCase|
 Telemetry_d13

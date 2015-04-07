@@ -26,12 +26,15 @@ dispatch =  [ ("sqlite", to_sqlite)
             ]
 
 
+convert_and_insert vlist migration insertion = do
+      runMigration migration
+      mapM_ insertion vlist
 
 -- ToDo remove 2nd argument (vlist).
 to_sqlite :: MyArgs -> [FileTelemetry] -> IO ()
 to_sqlite myargs vlist = runSqlite (pack $ targetdb myargs) $ 
   case schema myargs of
-    "d12" -> convert_d12 vlist
+    "d12" -> convert_and_insert vlist migrateAll_d12 insert_d12
     "d13" -> do
       runMigration migrateAll_d13
       let cvlist =  map (\(_, v) -> (V.map to_d13 v)) vlist -- TBD: ignoring filename now
