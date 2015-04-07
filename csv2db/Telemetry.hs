@@ -203,21 +203,27 @@ is_parsed :: Control.Monad.IO.Class.MonadIO m =>
                     m
                     [Entity Telemetry]
 -}
-is_parsed f = selectList [TelemetryFilename ==. f] [LimitTo 1]
+--is_parsed f = selectList [TelemetryFilename ==. f] [LimitTo 1]
 
+{-
+convert_d12 :: Control.Monad.IO.Class.MonadIO m =>
+               [(String, V.Vector Telemetry)] ->
+               Control.Monad.Trans.Reader.ReaderT Database.Persist.Sql.Types.SqlBackend m ()
+-}
 convert_d12 vlist = do
       runMigration migrateAll_d12
-      let cvlist =  map (\(f, v) -> (f, V.map (to_d12 f) v)) vlist -- to store filename
       mapM_ (\(f, v) -> do
               found <- selectList [Telemetry_d12Filename ==. f] [LimitTo 1]
               liftIO (putStrLn ("\tlength: " ++ (show (length found))))
               if length found == 0
-              then
-                  V.mapM_ insert v
+              then do
+                  -- not parsed yet
+                  let cv = V.map (to_d12 f) v
+                  V.mapM_ insert cv
               else
+                  -- already parsed: do nothing
                   liftIO (putStrLn ("\tskip because already parsed: " ++ f))
-                  -- do nothing
-           ) cvlist
+           ) vlist
 
 
 share [mkPersist sqlSettings, mkMigrate "migrateAll_d13"] [persistLowerCase|
