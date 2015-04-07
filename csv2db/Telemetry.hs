@@ -31,10 +31,10 @@ import Control.Applicative ((<*>), (<$>))
 import Control.Monad.IO.Class (liftIO)
 import qualified Data.Vector as V
 import Data.Csv
+import Data.String (IsString)
 import Database.Persist
 import Database.Persist.TH
 import Database.Persist.Sqlite (runMigration)
-import Data.String (IsString)
 
 -- return index val or return "" if index is too big.
 getval_or_empty :: (FromField a, Data.String.IsString a) =>
@@ -210,20 +210,27 @@ convert_d12 :: Control.Monad.IO.Class.MonadIO m =>
                [(String, V.Vector Telemetry)] ->
                Control.Monad.Trans.Reader.ReaderT Database.Persist.Sql.Types.SqlBackend m ()
 -}
-convert_d12 vlist = do
-      runMigration migrateAll_d12
-      mapM_ (\(f, v) -> do
+
+{-
+insert_d12 :: Control.Monad.IO.Class.MonadIO m =>
+        (String, V.Vector Telemetry)
+            -> Control.Monad.Trans.Reader.ReaderT Database.Persist.Sql.Types.SqlBackend m ()
+-}
+insert_d12 (f, v) = do
               found <- selectList [Telemetry_d12Filename ==. f] [LimitTo 1]
-              liftIO (putStrLn ("\tlength: " ++ (show (length found))))
               if length found == 0
               then do
                   -- not parsed yet
                   let cv = V.map (to_d12 f) v
+                  --liftIO $ putStrLn ("\tinsert length v: " ++ (show cv)) -- not evaluated without this?
                   V.mapM_ insert cv
               else
                   -- already parsed: do nothing
                   liftIO (putStrLn ("\tskip because already parsed: " ++ f))
-           ) vlist
+  
+convert_d12 vlist = do
+      runMigration migrateAll_d12
+      mapM_ insert_d12 vlist
 
 
 share [mkPersist sqlSettings, mkMigrate "migrateAll_d13"] [persistLowerCase|
