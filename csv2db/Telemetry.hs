@@ -15,7 +15,7 @@ module Telemetry
     , Telemetry_d12(..)
     , Telemetry_d12Id -- only for avoid warning
     , migrateAll_d12
-    , to_d12
+    , convert_d12
     , Telemetry_d13(..)
     , Telemetry_d13Id -- only for avoid warning
     , migrateAll_d13
@@ -28,9 +28,12 @@ module Telemetry
 
 import Numeric
 import Control.Applicative ((<*>), (<$>))
+import Control.Monad.IO.Class (liftIO)
 import qualified Data.Vector as V
 import Data.Csv
+import Database.Persist
 import Database.Persist.TH
+import Database.Persist.Sqlite (runMigration)
 import Data.String (IsString)
 
 -- return index val or return "" if index is too big.
@@ -121,6 +124,7 @@ instance FromRecord Telemetry where
                           (getval_or_empty v 48) <*>
                           (getval_or_empty v 100) -- TBD: fiename cannot be pased. store "" before conversion.
 
+
 share [mkPersist sqlSettings, mkMigrate "migrateAll_d12"] [persistLowerCase|
 Telemetry_d12
     serverTime String -- Int? -- index: 0
@@ -153,11 +157,12 @@ Telemetry_d12
     xx18 String
     xx19 String
     xx20 String
+    filename String
     deriving Show Eq
 |]
     
-to_d12 :: Telemetry -> Telemetry_d12
-to_d12 t = Telemetry_d12
+to_d12 :: String -> Telemetry -> Telemetry_d12
+to_d12 f t = Telemetry_d12
            (telemetryServerTime t)
            (telemetryConsoleType t)
            (telemetrySystemVer t)
@@ -188,6 +193,32 @@ to_d12 t = Telemetry_d12
            (telemetryP18 t)
            (telemetryP19 t)
            (telemetryP20 t)
+           (f)
+
+{-
+is_parsed :: Control.Monad.IO.Class.MonadIO m =>
+             String ->
+             Control.Monad.Trans.Reader.ReaderT
+                    Database.Persist.Sql.Types.SqlBackend
+                    m
+                    [Entity Telemetry]
+-}
+is_parsed f = selectList [TelemetryFilename ==. f] [LimitTo 1]
+
+convert_d12 vlist = do
+      runMigration migrateAll_d12
+      let cvlist =  map (\(f, v) -> (f, V.map (to_d12 f) v)) vlist -- to store filename
+      mapM_ (\(f, v) -> do
+              found <- selectList [Telemetry_d12Filename ==. f] [LimitTo 1]
+              liftIO (putStrLn ("\tlength: " ++ (show (length found))))
+              if length found == 0
+              then
+                  V.mapM_ insert v
+              else
+                  liftIO (putStrLn ("\tskip because already parsed: " ++ f))
+                  -- do nothing
+           ) cvlist
+
 
 share [mkPersist sqlSettings, mkMigrate "migrateAll_d13"] [persistLowerCase|
 Telemetry_d13

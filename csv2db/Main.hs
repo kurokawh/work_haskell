@@ -31,12 +31,7 @@ dispatch =  [ ("sqlite", to_sqlite)
 to_sqlite :: MyArgs -> [FileTelemetry] -> IO ()
 to_sqlite myargs vlist = runSqlite (pack $ targetdb myargs) $ 
   case schema myargs of
-    "d12" -> do
-      runMigration migrateAll_d12
-      --let cvlist =  map (V.map to_d12) vlist
-      -- let cvlist =  map (\(f, v) -> (f, V.map (to_d12 f) v)) vlist -- to store filename
-      let cvlist =  map (\(_, v) -> (V.map to_d12 v)) vlist -- TBD: ignoring filename now
-      mapM_ (V.mapM insert) cvlist
+    "d12" -> convert_d12 vlist
     "d13" -> do
       runMigration migrateAll_d13
       let cvlist =  map (\(_, v) -> (V.map to_d13 v)) vlist -- TBD: ignoring filename now
