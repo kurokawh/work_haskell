@@ -6,7 +6,6 @@ import qualified Data.ByteString.Lazy as BL
 import Data.Text (pack)
 import qualified Data.Vector as V
 import qualified Data.Csv as C
-import qualified Data.List as L
 import Data.Char (ord)
 import Database.Persist
 import Database.Persist.Sqlite
@@ -15,8 +14,8 @@ import qualified Codec.Compression.BZip as BZ
 import MyArgs
 import Telemetry
 
-
---dispatch :: [(String, MyArgs -> IO ())] -- ToDo: remove 2nd argument (vlist).
+-- ToDo: remove 2nd argument (vlist).
+dispatch :: [([Char], MyArgs -> [V.Vector Telemetry] -> IO ())]
 dispatch =  [ ("sqlite", to_sqlite)
 --            , ("postgresql", to_postgresql)
 --            , ("mysql", to_mysql)
@@ -25,28 +24,29 @@ dispatch =  [ ("sqlite", to_sqlite)
 
 
 -- ToDo remove 2nd argument (vlist).
-to_sqlite args vlist = runSqlite (pack $ targetdb args) $ 
-  case schema args of
+to_sqlite :: MyArgs -> [V.Vector Telemetry] -> IO ()
+to_sqlite myargs vlist = runSqlite (pack $ targetdb myargs) $ 
+  case schema myargs of
     "d12" -> do
       runMigration migrateAll_d12
       let cvlist =  map (V.map to_d12) vlist
-      mapM (V.mapM insert) cvlist
+      mapM_ (V.mapM insert) cvlist
       return ()
     "d13" -> do
       runMigration migrateAll_d13
       let cvlist =  map (V.map to_d13) vlist
-      mapM (V.mapM insert) cvlist
+      mapM_ (V.mapM insert) cvlist
       return ()
     "d29" -> do
       runMigration migrateAll_d29
       let cvlist =  map (V.map to_d29) vlist
-      mapM (V.mapM insert) cvlist
+      mapM_ (V.mapM insert) cvlist
       return ()
     "normal" -> do
       runMigration migrateAll
-      mapM (V.mapM insert) vlist
+      mapM_ (V.mapM insert) vlist
       return ()
-    otherwise -> error "unknown SCHEMA_INDEX."
+    _ -> error "unknown SCHEMA_INDEX."
 
 decodeOpt :: C.DecodeOptions
 decodeOpt = C.defaultDecodeOptions {
@@ -76,18 +76,19 @@ file_to_vec filename = do
           return v
 
 arg_to_vlist :: C.FromRecord a => MyArgs -> IO [V.Vector a]
-arg_to_vlist args = do
-  flist <- mapM file_to_vec (csvfiles args)
-  rfiles <- recursive_files args
+arg_to_vlist myargs = do
+  flist <- mapM file_to_vec (csvfiles myargs)
+  rfiles <- recursive_files myargs
   rlist <- mapM file_to_vec rfiles
   return (flist ++ rlist)
 
+main :: IO ()
 main = do
-  args <- cmdArgs config
-  let (Just to_db) = lookup (dbopt　args) dispatch
-  vlist <- arg_to_vlist args
+  myargs <- cmdArgs config
+  let (Just to_db) = lookup (dbopt　myargs) dispatch
+  vlist <- arg_to_vlist myargs
   if length vlist == 0 
   then
-      print args
+      print myargs
   else
-      to_db args (vlist :: [V.Vector Telemetry])
+      to_db myargs (vlist :: [V.Vector Telemetry])

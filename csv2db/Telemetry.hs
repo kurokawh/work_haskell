@@ -10,34 +10,40 @@
 {-# LANGUAGE FlexibleInstances          #-}
 module Telemetry
     ( Telemetry(..)
+    , TelemetryId     -- only for avoid warning
     , migrateAll
     , Telemetry_d12(..)
+    , Telemetry_d12Id -- only for avoid warning
     , migrateAll_d12
     , to_d12
     , Telemetry_d13(..)
+    , Telemetry_d13Id -- only for avoid warning
     , migrateAll_d13
     , to_d13
     , Telemetry_d29(..)
+    , Telemetry_d29Id -- only for avoid warning
     , migrateAll_d29
     , to_d29
     ) where
 
 import Numeric
-import Control.Monad (MonadPlus, mplus, mzero)
-import Control.Applicative (Alternative, Applicative,
-                            (<*>), (<$>), (<|>), (<*), (*>), empty, pure)
+import Control.Applicative ((<*>), (<$>))
 import qualified Data.Vector as V
 import Data.Csv
 import Database.Persist.TH
+import Data.String (IsString)
 
 -- return index val or return "" if index is too big.
---getval_or_empty :: Record -> Int -> String
+getval_or_empty :: (FromField a, Data.String.IsString a) =>
+                   V.Vector Field -> Int -> Parser a
 getval_or_empty v i
     | i < V.length v = v .! i
     | otherwise      = return ""
 
+decstr_to_int :: String -> Int
 decstr_to_int decstr = read decstr :: Int
 
+hexstr_to_int :: String -> Int
 hexstr_to_int hexstr = x
     where [(x,_)] = readHex hexstr
 
