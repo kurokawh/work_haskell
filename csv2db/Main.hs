@@ -35,14 +35,8 @@ to_sqlite :: MyArgs -> [FileTelemetry] -> IO ()
 to_sqlite myargs vlist = runSqlite (pack $ targetdb myargs) $ 
   case schema myargs of
     "d12" -> convert_and_insert vlist migrateAll_d12 insert_d12
-    "d13" -> do
-      runMigration migrateAll_d13
-      let cvlist =  map (\(_, v) -> (V.map to_d13 v)) vlist -- TBD: ignoring filename now
-      mapM_ (V.mapM insert) cvlist
-    "d29" -> do
-      runMigration migrateAll_d29
-      let cvlist =  map (\(_, v) -> (V.map to_d29 v)) vlist -- TBD: ignoring filename now
-      mapM_ (V.mapM insert) cvlist
+    "d13" -> convert_and_insert vlist migrateAll_d13 insert_d13
+    "d29" -> convert_and_insert vlist migrateAll_d29 insert_d29
     "normal" -> do
       runMigration migrateAll
       --mapM_ (V.mapM insert) vlist

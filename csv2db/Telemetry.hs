@@ -19,11 +19,11 @@ module Telemetry
     , Telemetry_d13(..)
     , Telemetry_d13Id -- only for avoid warning
     , migrateAll_d13
-    , to_d13
+    , insert_d13
     , Telemetry_d29(..)
     , Telemetry_d29Id -- only for avoid warning
     , migrateAll_d29
-    , to_d29
+    , insert_d29
     ) where
 
 import Numeric
@@ -195,22 +195,7 @@ to_d12 f t = Telemetry_d12
            (f)
 
 
-{-
-insert_d12 :: Control.Monad.IO.Class.MonadIO m =>
-        (String, V.Vector Telemetry)
-            -> Control.Monad.Trans.Reader.ReaderT Database.Persist.Sql.Types.SqlBackend m ()
--}
-insert_d12 (f, v) = do
-              found <- selectList [Telemetry_d12Filename ==. f] [LimitTo 1]
-              if length found == 0
-              then do
-                  -- not parsed yet
-                  let cv = V.map (to_d12 f) v
-                  V.mapM_ insert cv
-              else
-                  -- already parsed: do nothing
-                  liftIO (putStrLn ("\tskip because already parsed: " ++ f))
-  
+ 
 
 share [mkPersist sqlSettings, mkMigrate "migrateAll_d13"] [persistLowerCase|
 Telemetry_d13
@@ -226,11 +211,12 @@ Telemetry_d13
     uniqueId String -- index: 11
     hexInt Int -- test 1
     hexVal Int -- test 2
+    filename String -- TBD
     deriving Show Eq
 |]
     
-to_d13 :: Telemetry -> Telemetry_d13
-to_d13 t = Telemetry_d13
+to_d13 :: String -> Telemetry -> Telemetry_d13
+to_d13 f t = Telemetry_d13
            (telemetryServerTime t)
            (telemetryConsoleType t)
            (telemetrySystemVer t)
@@ -243,6 +229,7 @@ to_d13 t = Telemetry_d13
            (telemetryUniqueId t)
            (decstr_to_int $ telemetryP1 t)
            (hexstr_to_int $ telemetryP1 t)
+           (f)
 
 share [mkPersist sqlSettings, mkMigrate "migrateAll_d29"] [persistLowerCase|
 Telemetry_d29
@@ -256,11 +243,12 @@ Telemetry_d29
     timestamp String -- Int?
     clockType Int
     uniqueId String -- index: 11
+    filename String -- TBD
     deriving Show Eq
 |]
     
-to_d29 :: Telemetry -> Telemetry_d29
-to_d29 t = Telemetry_d29
+to_d29 :: String -> Telemetry -> Telemetry_d29
+to_d29 f t = Telemetry_d29
            (telemetryServerTime t)
            (telemetryConsoleType t)
            (telemetrySystemVer t)
@@ -271,4 +259,45 @@ to_d29 t = Telemetry_d29
            (telemetryTimestamp t)
            (telemetryClockType t)
            (telemetryUniqueId t)
+           (f)
 
+
+
+
+
+
+{-
+insert_d12 :: Control.Monad.IO.Class.MonadIO m =>
+        (String, V.Vector Telemetry)
+            -> Control.Monad.Trans.Reader.ReaderT Database.Persist.Sql.Types.SqlBackend m ()
+-}
+insert_d12 (f, v) = do
+              found <- selectList [Telemetry_d12Filename ==. f] [LimitTo 1]
+              if length found == 0
+              then do
+                  -- not parsed yet
+                  let cv = V.map (to_d12 f) v
+                  V.mapM_ insert cv
+              else
+                  -- already parsed: do nothing
+                  liftIO (putStrLn ("\tskip because already parsed: " ++ f))
+insert_d13 (f, v) = do
+              found <- selectList [Telemetry_d13Filename ==. f] [LimitTo 1]
+              if length found == 0
+              then do
+                  -- not parsed yet
+                  let cv = V.map (to_d13 f) v
+                  V.mapM_ insert cv
+              else
+                  -- already parsed: do nothing
+                  liftIO (putStrLn ("\tskip because already parsed: " ++ f))
+insert_d29 (f, v) = do
+              found <- selectList [Telemetry_d29Filename ==. f] [LimitTo 1]
+              if length found == 0
+              then do
+                  -- not parsed yet
+                  let cv = V.map (to_d29 f) v
+                  V.mapM_ insert cv
+              else
+                  -- already parsed: do nothing
+                  liftIO (putStrLn ("\tskip because already parsed: " ++ f))
