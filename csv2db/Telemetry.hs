@@ -79,7 +79,8 @@ Telemetry
     p17 String
     p18 String
     p19 String
-    p20 String
+    p20 String -- index: 48
+    filename String -- store filename to avoid duplicated insertion.
 --    Primary serverTime
     deriving Show Eq
 |]
@@ -117,7 +118,8 @@ instance FromRecord Telemetry where
                           (getval_or_empty v 45) <*>
                           (getval_or_empty v 46) <*>
                           (getval_or_empty v 47) <*>
-                          (getval_or_empty v 48)
+                          (getval_or_empty v 48) <*>
+                          (getval_or_empty v 100) -- TBD: fiename cannot be pased. store "" before conversion.
 
 share [mkPersist sqlSettings, mkMigrate "migrateAll_d12"] [persistLowerCase|
 Telemetry_d12

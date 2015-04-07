@@ -14,8 +14,12 @@ import qualified Codec.Compression.BZip as BZ
 import MyArgs
 import Telemetry
 
+
+
+type FileTelemetry = (String, V.Vector Telemetry)
+    
 -- ToDo: remove 2nd argument (vlist).
-dispatch :: [([Char], MyArgs -> [V.Vector Telemetry] -> IO ())]
+dispatch :: [([Char], MyArgs -> [FileTelemetry] -> IO ())]
 dispatch =  [ ("sqlite", to_sqlite)
 --            , ("postgresql", to_postgresql)
 --            , ("mysql", to_mysql)
@@ -24,28 +28,27 @@ dispatch =  [ ("sqlite", to_sqlite)
 
 
 -- ToDo remove 2nd argument (vlist).
-to_sqlite :: MyArgs -> [V.Vector Telemetry] -> IO ()
+to_sqlite :: MyArgs -> [FileTelemetry] -> IO ()
 to_sqlite myargs vlist = runSqlite (pack $ targetdb myargs) $ 
   case schema myargs of
     "d12" -> do
       runMigration migrateAll_d12
-      let cvlist =  map (V.map to_d12) vlist
+      --let cvlist =  map (V.map to_d12) vlist
+      -- let cvlist =  map (\(f, v) -> (f, V.map (to_d12 f) v)) vlist -- to store filename
+      let cvlist =  map (\(_, v) -> (V.map to_d12 v)) vlist -- TBD: ignoring filename now
       mapM_ (V.mapM insert) cvlist
-      return ()
     "d13" -> do
       runMigration migrateAll_d13
-      let cvlist =  map (V.map to_d13) vlist
+      let cvlist =  map (\(_, v) -> (V.map to_d13 v)) vlist -- TBD: ignoring filename now
       mapM_ (V.mapM insert) cvlist
-      return ()
     "d29" -> do
       runMigration migrateAll_d29
-      let cvlist =  map (V.map to_d29) vlist
+      let cvlist =  map (\(_, v) -> (V.map to_d29 v)) vlist -- TBD: ignoring filename now
       mapM_ (V.mapM insert) cvlist
-      return ()
     "normal" -> do
       runMigration migrateAll
-      mapM_ (V.mapM insert) vlist
-      return ()
+      --mapM_ (V.mapM insert) vlist
+      mapM_ (\(_, v) -> (V.mapM insert v)) vlist -- TBD: ignoring filename now
     _ -> error "unknown SCHEMA_INDEX."
 
 decodeOpt :: C.DecodeOptions
@@ -63,7 +66,7 @@ file_to_bs filename =
     else do
       BL.readFile filename
 
-file_to_vec :: C.FromRecord a => String -> IO (V.Vector a)
+file_to_vec :: C.FromRecord a => String -> IO (String, V.Vector a)
 file_to_vec filename = do
     putStrLn ("parsing : " ++ filename)
     csvData <- file_to_bs filename
@@ -73,9 +76,9 @@ file_to_vec filename = do
           error err
         Right v -> do
           --putStrLn "OK!"
-          return v
+          return (filename, v)
 
-arg_to_vlist :: C.FromRecord a => MyArgs -> IO [V.Vector a]
+arg_to_vlist :: C.FromRecord a => MyArgs -> IO [(String, V.Vector a)]
 arg_to_vlist myargs = do
   flist <- mapM file_to_vec (csvfiles myargs)
   rfiles <- recursive_files myargs
@@ -91,4 +94,4 @@ main = do
   then
       print myargs
   else
-      to_db myargs (vlist :: [V.Vector Telemetry])
+      to_db myargs (vlist :: [FileTelemetry])
