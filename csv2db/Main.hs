@@ -37,10 +37,7 @@ to_sqlite myargs vlist = runSqlite (pack $ targetdb myargs) $
     "d12" -> convert_and_insert vlist migrateAll_d12 insert_d12
     "d13" -> convert_and_insert vlist migrateAll_d13 insert_d13
     "d29" -> convert_and_insert vlist migrateAll_d29 insert_d29
-    "normal" -> do
-      runMigration migrateAll
-      --mapM_ (V.mapM insert) vlist
-      mapM_ (\(_, v) -> (V.mapM insert v)) vlist -- TBD: ignoring filename now
+    "normal" -> convert_and_insert vlist migrateAll insert_tel
     _ -> error "unknown SCHEMA_INDEX."
 
 decodeOpt :: C.DecodeOptions

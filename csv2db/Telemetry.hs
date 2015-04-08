@@ -12,6 +12,7 @@ module Telemetry
     ( Telemetry(..)
     , TelemetryId     -- only for avoid warning
     , migrateAll
+    , insert_tel
     , Telemetry_d12(..)
     , Telemetry_d12Id -- only for avoid warning
     , migrateAll_d12
@@ -122,6 +123,40 @@ instance FromRecord Telemetry where
                           (getval_or_empty v 47) <*>
                           (getval_or_empty v 48) <*>
                           (getval_or_empty v 100) -- TBD: fiename cannot be pased. store "" before conversion.
+
+to_tel :: String -> Telemetry -> Telemetry
+to_tel f t = Telemetry
+           (telemetryServerTime t)
+           (telemetryConsoleType t)
+           (telemetrySystemVer t)
+           (telemetryProductCode t)
+           (telemetryProductSubCode t)
+           (telemetryIdu t)
+           (telemetryLogConfVer t)
+           (telemetryTimestamp t)
+           (telemetryClockType t)
+           (telemetryUniqueId t)
+           (telemetryP1 t)
+           (telemetryP2 t)
+           (telemetryP3 t)
+           (telemetryP4 t)
+           (telemetryP5 t)
+           (telemetryP6 t)
+           (telemetryP7 t)
+           (telemetryP8 t)
+           (telemetryP9 t)
+           (telemetryP10 t)
+           (telemetryP11 t)
+           (telemetryP12 t)
+           (telemetryP13 t)
+           (telemetryP14 t)
+           (telemetryP15 t)
+           (telemetryP16 t)
+           (telemetryP17 t)
+           (telemetryP18 t)
+           (telemetryP19 t)
+           (telemetryP20 t)
+           (f)
 
 
 share [mkPersist sqlSettings, mkMigrate "migrateAll_d12"] [persistLowerCase|
@@ -306,6 +341,16 @@ insert_d29 (f, v) = do
               then do
                   -- not parsed yet
                   let cv = V.map (to_d29 f) v
+                  V.mapM_ insert cv
+              else
+                  -- already parsed: do nothing
+                  liftIO (putStrLn ("\tskip because already parsed: " ++ f))
+insert_tel (f, v) = do
+              found <- selectList [TelemetryFilename ==. f] [LimitTo 1]
+              if length found == 0
+              then do
+                  -- not parsed yet
+                  let cv = V.map (to_tel f) v
                   V.mapM_ insert cv
               else
                   -- already parsed: do nothing
