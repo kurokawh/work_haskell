@@ -50,25 +50,36 @@ decodeOpt = C.defaultDecodeOptions {
 
 -- if given file is bz2 then decompress, otherwise returan raw data
 file_to_bs :: String -> IO BL.ByteString
-file_to_bs filename =
-    if (FP.takeExtension filename) == ".bz2"
+file_to_bs file =
+    if (FP.takeExtension file) == ".bz2"
     then do
-      bzData <- BL.readFile filename
+      bzData <- BL.readFile file
       return (BZ.decompress bzData)
     else do
-      BL.readFile filename
+      BL.readFile file
 
 file_to_vec :: C.FromRecord a => String -> IO (String, V.Vector a)
-file_to_vec filename = do
-    putStrLn ("parsing : " ++ filename)
-    csvData <- file_to_bs filename
+file_to_vec file = do
+    putStrLn ("parsing : " ++ file)
+    csvData <- file_to_bs file
     case C.decodeWith decodeOpt C.NoHeader csvData of
         Left err -> do
           putStrLn err
           error err
         Right v -> do
           --putStrLn "OK!"
-          return (filename, v)
+          return (file_to_filename file, v)
+
+-- extract a filename from a (relative) file path.
+-- if extension is ".bz2", remove it.
+file_to_filename :: String -> String
+file_to_filename file =
+    if (FP.takeExtension file) == ".bz2"
+    then
+      FP.takeBaseName file
+    else
+      FP.takeFileName file
+
 
 arg_to_vlist :: C.FromRecord a => MyArgs -> IO [(String, V.Vector a)]
 arg_to_vlist myargs = do

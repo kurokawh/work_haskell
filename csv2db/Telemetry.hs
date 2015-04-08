@@ -136,26 +136,14 @@ Telemetry_d12
     timestamp String -- Int?
     clockType Int
     uniqueId String -- index: 11
-    xx1 String -- index: 29
-    xx2 String
-    xx3 String
-    xx4 String
-    xx5 String
-    xx6 String
-    xx7 String
-    xx8 String
-    xx9 String
-    xx10 String
-    xx11 String
-    xx12 String
-    xx13 String
-    xx14 String
-    xx15 String
-    xx16 String
-    xx17 String
-    xx18 String
-    xx19 String
-    xx20 String
+    bootTrigger Int -- index: 29 (p1)
+    dbFile String
+    dbProcess Int
+    dbOperation Int
+    corruptReason Int
+    estimatedTime Int
+    actualTime Int
+    prevSystemVer String -- index: 36 (p8)
     filename String
     deriving Show Eq
 |]
@@ -172,29 +160,15 @@ to_d12 f t = Telemetry_d12
            (telemetryTimestamp t)
            (telemetryClockType t)
            (telemetryUniqueId t)
-           (telemetryP1 t)
-           (telemetryP2 t)
-           (telemetryP3 t)
-           (telemetryP4 t)
-           (telemetryP5 t)
-           (telemetryP6 t)
-           (telemetryP7 t)
-           (telemetryP8 t)
-           (telemetryP9 t)
-           (telemetryP10 t)
-           (telemetryP11 t)
-           (telemetryP12 t)
-           (telemetryP13 t)
-           (telemetryP14 t)
-           (telemetryP15 t)
-           (telemetryP16 t)
-           (telemetryP17 t)
-           (telemetryP18 t)
-           (telemetryP19 t)
-           (telemetryP20 t)
+           (decstr_to_int $ telemetryP1 t) -- boot trigger
+           (telemetryP2 t) -- db file path
+           (decstr_to_int $ telemetryP3 t) -- db process index
+           (decstr_to_int $ telemetryP4 t) -- db operation index
+           (decstr_to_int $ telemetryP5 t) -- corrupt reason
+           (hexstr_to_int $ telemetryP6 t) -- estimated time
+           (hexstr_to_int $ telemetryP7 t) -- actual time
+           (telemetryP8 t) -- prev system ver
            (f)
-
-
  
 
 share [mkPersist sqlSettings, mkMigrate "migrateAll_d13"] [persistLowerCase|
@@ -208,9 +182,15 @@ Telemetry_d13
     logConfVer String
     timestamp String -- Int?
     clockType Int
-    uniqueId String -- index: 11
-    hexInt Int -- test 1
-    hexVal Int -- test 2
+    uniqueId String -- index: 11 (p1)
+    storageSize Int
+    availableSize Int
+    manufacture String
+    product String
+    mountResult Int
+    filesystem Int
+    numOfUsb Int
+    numOfPartition Int -- (p8)
     filename String -- TBD
     deriving Show Eq
 |]
@@ -227,8 +207,14 @@ to_d13 f t = Telemetry_d13
            (telemetryTimestamp t)
            (telemetryClockType t)
            (telemetryUniqueId t)
-           (decstr_to_int $ telemetryP1 t)
-           (hexstr_to_int $ telemetryP1 t)
+           (hexstr_to_int $ telemetryP1 t) -- storage size
+           (hexstr_to_int $ telemetryP2 t) -- available size
+           (telemetryP3 t) -- manufacture
+           (telemetryP4 t) -- product
+           (hexstr_to_int $ telemetryP5 t) -- mount result
+           (hexstr_to_int $ telemetryP6 t) -- filesystem
+           (hexstr_to_int $ telemetryP7 t) -- num of attached USB mass
+           (hexstr_to_int $ telemetryP8 t) -- num of partition
            (f)
 
 share [mkPersist sqlSettings, mkMigrate "migrateAll_d29"] [persistLowerCase|
@@ -243,6 +229,19 @@ Telemetry_d29
     timestamp String -- Int?
     clockType Int
     uniqueId String -- index: 11
+    dbfileSize Int -- p1
+    numOfTitles Int
+    numOfPhotos Int
+    numOfTrophyPhotos Int
+    numOfShareTagPhotos Int
+    numOfVideos Int -- p6
+    numOfTrophyVideos Int
+    numOfShareTagVideos Int
+    numOfShareTags Int
+    numOfCommonTag Int
+    numOfDmTag Int -- p11
+    numOfYtTag Int
+    numOfTwtTag Int -- p13
     filename String -- TBD
     deriving Show Eq
 |]
@@ -259,10 +258,20 @@ to_d29 f t = Telemetry_d29
            (telemetryTimestamp t)
            (telemetryClockType t)
            (telemetryUniqueId t)
+           (hexstr_to_int $ telemetryP1 t)
+           (hexstr_to_int $ telemetryP2 t)
+           (hexstr_to_int $ telemetryP3 t)
+           (hexstr_to_int $ telemetryP4 t)
+           (hexstr_to_int $ telemetryP5 t)
+           (hexstr_to_int $ telemetryP6 t)
+           (hexstr_to_int $ telemetryP7 t)
+           (hexstr_to_int $ telemetryP8 t)
+           (hexstr_to_int $ telemetryP9 t)
+           (hexstr_to_int $ telemetryP10 t)
+           (hexstr_to_int $ telemetryP11 t)
+           (hexstr_to_int $ telemetryP12 t)
+           (hexstr_to_int $ telemetryP13 t)
            (f)
-
-
-
 
 
 
