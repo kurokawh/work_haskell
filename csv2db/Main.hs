@@ -7,7 +7,6 @@ import Data.Text (pack)
 import qualified Data.Vector as V
 import qualified Data.Csv as C
 import Data.Char (ord)
-import Database.Persist
 import Database.Persist.Sqlite
 import qualified Codec.Compression.BZip as BZ
 

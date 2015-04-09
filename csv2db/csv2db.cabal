@@ -28,6 +28,7 @@ executable csv2db
                      , vector
                      , cassava
                      , bzlib
+                     , http-types
                      , transformers
                      , persistent-template
                      , persistent >= 2.0

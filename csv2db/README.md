@@ -38,9 +38,7 @@ TBD
 ToDo:
 ----
 * schema operation
-  - column name
-  - enum conversion
-* avoid dupulicated insertion (by checking filename)
+  - dynamic schema definition.
 * switch csv & tsv (TAB separated)  
 
 
