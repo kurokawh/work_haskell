@@ -12,7 +12,7 @@ module DbRecord
     ( DbRecord(..)
     , DbRecordId     -- only for avoid warning
     , migrateAll
-    , insert_tel
+    , insert_rec
     , DbRecord_s2(..)
     , DbRecord_s2Id -- only for avoid warning
     , migrateAll_s2
@@ -49,9 +49,9 @@ hexstr_to_int hexstr = x
     where [(x,_)] = readHex hexstr
 
 -- for qaf & samplingRate
-telstr_to_int :: String -> Int
-telstr_to_int "" = 0
-telstr_to_int s = read s :: Int
+recstr_to_int :: String -> Int
+recstr_to_int "" = 0
+recstr_to_int s = read s :: Int
 
 url_decode :: String -> String
 url_decode = unpack.(urlDecode False).pack
@@ -113,8 +113,8 @@ instance FromRecord DbRecord where
                           (getval_or_empty v 18) <*>
                           (getval_or_empty v 19)
 
-to_tel :: String -> DbRecord -> DbRecord
-to_tel f t = DbRecord
+to_rec :: String -> DbRecord -> DbRecord
+to_rec f t = DbRecord
            (f)
            (url_decode $ dbRecordP1 t)
            (url_decode $ dbRecordP2 t)
@@ -153,7 +153,7 @@ to_s2 f t = DbRecord_s2
            (f)
            (dbRecordP1 t)
            (dbRecordP2 t)
-           (telstr_to_int $ dbRecordP3 t)
+           (recstr_to_int $ dbRecordP3 t)
            (dbRecordP4 t)
  
 
@@ -198,12 +198,12 @@ insert_s3 (f, v) = do
               else
                   -- already parsed: do nothing
                   liftIO (putStrLn ("\tskip because already parsed: " ++ f))
-insert_tel (f, v) = do
+insert_rec (f, v) = do
               found <- selectList [DbRecordFilename ==. f] [LimitTo 1]
               if length found == 0
               then do
                   -- not parsed yet
-                  let cv = V.map (to_tel f) v
+                  let cv = V.map (to_rec f) v
                   V.mapM_ insert cv
               else
                   -- already parsed: do nothing

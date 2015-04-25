@@ -35,7 +35,7 @@ to_sqlite myargs vlist = runSqlite (pack $ targetdb myargs) $
   case schema myargs of
     "s2" -> convert_and_insert vlist migrateAll_s2 insert_s2
     "s3" -> convert_and_insert vlist migrateAll_s3 insert_s3
-    "normal" -> convert_and_insert vlist migrateAll insert_tel
+    "normal" -> convert_and_insert vlist migrateAll insert_rec
     _ -> error "unknown SCHEMA_INDEX."
 
 decodeOpt :: C.DecodeOptions
