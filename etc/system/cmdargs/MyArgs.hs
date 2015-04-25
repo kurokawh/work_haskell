@@ -26,7 +26,7 @@ help_program = "parse CSV files and store all data into DB.\n"
 config = MyArgs {
       dbopt   = SQLite &= typ "TARGET_DB_TYPE" &= help help_dbopt
     , schema  = "normal" &= typ "SCHEMA_INDEX" &= help help_schema
-    , recursive = "" &= typ "RECURSIVE_DIR" &= help help_recursive
+    , recursive = def &= typ "RECURSIVE_DIR" &= help help_recursive
     , targetdb  = def &= typ "TARGET_DB" &= argPos 0 -- &= help help_targetdb
     , csvfiles = def &= typ "CSV_FILES" &= args -- &= help help_csvfiles
 } &= program "csv2db" &= help help_program
