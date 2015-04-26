@@ -8,14 +8,19 @@ module MyArgs
 , targetdb
 , csvfiles
 , recursive_files
+, DbOpt(..)
 ) where
 
 import System.Directory
 import System.FilePath
 import System.Console.CmdArgs
 
+data DbOpt = SQLite 
+           | PostgreSQL 
+           | MySQL 
+             deriving (Data, Typeable, Eq, Show, Read)
 data MyArgs = MyArgs {
-      dbopt    :: String
+      dbopt    :: DbOpt
     , schema   :: String
     , recursive :: String
     , targetdb :: String
@@ -35,7 +40,7 @@ help_program = "parse CSV files and store all data into DB.\n"
                ++ "TARGET_DB is the mandatory argument."
 
 config = MyArgs {
-      dbopt   = "sqlite" &= typ "TARGET_DB_TYPE" &= help help_dbopt
+      dbopt   = SQLite &= typ "TARGET_DB_TYPE" &= help help_dbopt
     , schema  = "normal" &= typ "SCHEMA_INDEX" &= help help_schema
     , recursive = "" &= typ "RECURSIVE_DIR" &= help help_recursive
     , targetdb  = def &= typ "TARGET_DB" &= argPos 0 -- &= help help_targetdb

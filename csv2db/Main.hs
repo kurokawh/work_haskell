@@ -9,7 +9,8 @@ import qualified Data.Csv as C
 import Data.Char (ord)
 import Database.Persist.Sqlite
 import qualified Codec.Compression.BZip as BZ
-
+import Control.Monad.IO.Class (MonadIO)
+import Control.Monad.Trans.Reader (ReaderT)
 import MyArgs
 import DbRecord
 
@@ -18,13 +19,18 @@ import DbRecord
 type FileDbRecord = (String, V.Vector DbRecord)
     
 -- ToDo: remove 2nd argument (vlist).
-dispatch :: [([Char], MyArgs -> [FileDbRecord] -> IO ())]
-dispatch =  [ ("sqlite", to_sqlite)
---            , ("postgresql", to_postgresql)
---            , ("mysql", to_mysql)
+dispatch :: [(DbOpt, MyArgs -> [FileDbRecord] -> IO ())]
+dispatch =  [ (SQLite, to_sqlite)
+--            , (PostgreSQL, to_postgresql)
+--            , (MySQL, to_mysql)
             ]
 
 
+convert_and_insert :: Control.Monad.IO.Class.MonadIO m =>
+                      [a]
+                      -> Migration
+                      -> (a -> Control.Monad.Trans.Reader.ReaderT SqlBackend m b)
+                      -> Control.Monad.Trans.Reader.ReaderT SqlBackend m ()
 convert_and_insert vlist migration insertion = do
       runMigration migration
       mapM_ insertion vlist

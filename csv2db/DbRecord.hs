@@ -23,7 +23,6 @@ module DbRecord
     , insert_s3
     ) where
 
-import Numeric
 import Control.Applicative ((<*>), (<$>))
 import Control.Monad.IO.Class (liftIO)
 import qualified Data.Vector as V
@@ -41,12 +40,19 @@ getval_or_empty v i
     | i < V.length v = v .! i
     | otherwise      = return ""
 
+{-
 decstr_to_int :: String -> Int
 decstr_to_int decstr = read decstr :: Int
 
 hexstr_to_int :: String -> Int
 hexstr_to_int hexstr = x
     where [(x,_)] = readHex hexstr
+
+enum_to_str :: [String] -> Int -> String
+enum_to_str list idx
+    | idx < (length list) && idx >= 0 = list !! idx
+    | otherwise = show idx
+-}
 
 -- for qaf & samplingRate
 recstr_to_int :: String -> Int
@@ -55,11 +61,6 @@ recstr_to_int s = read s :: Int
 
 url_decode :: String -> String
 url_decode = unpack.(urlDecode False).pack
-
-enum_to_str :: [String] -> Int -> String
-enum_to_str list idx
-    | idx < (length list) && idx >= 0 = list !! idx
-    | otherwise = show idx
 
 -- general schema
 share [mkPersist sqlSettings, mkMigrate "migrateAll"] [persistLowerCase|
