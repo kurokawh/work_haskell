@@ -7,7 +7,7 @@ import System.IO
 
 import DistribUtils
 
-import Database  (Database, createDB, get, set, rcdata)
+import DatabaseSample  (Database, createDB, get, set, rcdata)
 
 main = distribMain master rcdata
 

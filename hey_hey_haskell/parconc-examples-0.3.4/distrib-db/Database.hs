@@ -17,13 +17,13 @@ type Value = String
 type Database = ProcessId
 
 createDB :: [NodeId] -> Process Database
-createDB nodes = error "not implemented!" -- exercise
+createDB nodes = error "not implemented! cdb" -- exercise
 
 set :: Database -> Key -> Value -> Process ()
-set db k v = error "not implemented!" -- exercise
+set db k v = error "not implemented! set" -- exercise
 
 get :: Database -> Key -> Process (Maybe Value)
-get db k = error "not implemented!" -- exercise
+get db k = error "not implemented! get" -- exercise
 
 rcdata :: RemoteTable -> RemoteTable
 rcdata = id
