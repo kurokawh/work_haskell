@@ -16,7 +16,7 @@ import DbRecord
 
 
 
-type FileDbRecord = (String, V.Vector DbRecord)
+type FileDbRecord = (FilePath, V.Vector DbRecord)
     
 -- ToDo: remove 2nd argument (vlist).
 dispatch :: [(DbOpt, MyArgs -> [FileDbRecord] -> IO ())]
@@ -50,7 +50,7 @@ decodeOpt = C.defaultDecodeOptions {
             }
 
 -- if given file is bz2 then decompress, otherwise returan raw data
-file_to_bs :: String -> IO BL.ByteString
+file_to_bs :: FilePath -> IO BL.ByteString
 file_to_bs file =
     if (FP.takeExtension file) == ".bz2"
     then do
@@ -59,7 +59,7 @@ file_to_bs file =
     else do
       BL.readFile file
 
-file_to_vec :: C.FromRecord a => String -> IO (String, V.Vector a)
+file_to_vec :: C.FromRecord a => FilePath -> IO (FilePath, V.Vector a)
 file_to_vec file = do
     putStrLn ("parsing : " ++ file)
     csvData <- file_to_bs file
@@ -73,7 +73,7 @@ file_to_vec file = do
 
 -- extract a filename from a (relative) file path.
 -- if extension is ".bz2", remove it.
-file_to_filename :: String -> String
+file_to_filename :: FilePath -> FilePath
 file_to_filename file =
     if (FP.takeExtension file) == ".bz2"
     then
@@ -82,7 +82,7 @@ file_to_filename file =
       FP.takeFileName file
 
 
-arg_to_vlist :: C.FromRecord a => MyArgs -> IO [(String, V.Vector a)]
+arg_to_vlist :: C.FromRecord a => MyArgs -> IO [(FilePath, V.Vector a)]
 arg_to_vlist myargs = do
   flist <- mapM file_to_vec (csvfiles myargs)
   rfiles <- recursive_files myargs
