@@ -24,13 +24,15 @@ module DbRecord
     ) where
 
 import Control.Applicative ((<*>), (<$>))
-import Control.Monad.IO.Class (liftIO)
+import Control.Monad.IO.Class (liftIO, MonadIO)
+import Control.Monad.Trans.Reader  (ReaderT)
 import qualified Data.Vector as V
 import Data.Csv
 import Data.String (IsString)
 import Data.ByteString.Char8 (pack, unpack)
 import Database.Persist
 import Database.Persist.TH
+import Database.Persist.Sqlite (SqlBackend)
 import Network.HTTP.Types.URI (urlDecode)
 
 -- return index val or return "" if index is too big.
@@ -174,11 +176,9 @@ to_s3 f t = DbRecord_s3
 
 
 
-{-
 insert_s2 :: Control.Monad.IO.Class.MonadIO m =>
-        (String, V.Vector DbRecord)
-            -> Control.Monad.Trans.Reader.ReaderT Database.Persist.Sql.Types.SqlBackend m ()
--}
+             (String, V.Vector DbRecord)
+             -> Control.Monad.Trans.Reader.ReaderT SqlBackend m ()
 insert_s2 (f, v) = do
               found <- selectList [DbRecord_s2Filename ==. f] [LimitTo 1]
               if length found == 0
@@ -189,6 +189,9 @@ insert_s2 (f, v) = do
               else
                   -- already parsed: do nothing
                   liftIO (putStrLn ("\tskip because already parsed: " ++ f))
+insert_s3 :: Control.Monad.IO.Class.MonadIO m =>
+             (String, V.Vector DbRecord)
+             -> Control.Monad.Trans.Reader.ReaderT SqlBackend m ()
 insert_s3 (f, v) = do
               found <- selectList [DbRecord_s3Filename ==. f] [LimitTo 1]
               if length found == 0
@@ -199,6 +202,9 @@ insert_s3 (f, v) = do
               else
                   -- already parsed: do nothing
                   liftIO (putStrLn ("\tskip because already parsed: " ++ f))
+insert_rec :: Control.Monad.IO.Class.MonadIO m =>
+             (String, V.Vector DbRecord)
+             -> Control.Monad.Trans.Reader.ReaderT SqlBackend m ()
 insert_rec (f, v) = do
               found <- selectList [DbRecordFilename ==. f] [LimitTo 1]
               if length found == 0
