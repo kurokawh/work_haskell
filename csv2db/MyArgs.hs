@@ -32,7 +32,7 @@ help_dbopt = "specify DB type. default DB is 'sqlite'.\n"
              ++ "'postgresql', 'mysql' & etc. may be supported in the future."
 help_schema :: [Char]
 help_schema = "specify table name.\n"
-              ++ "specify predefined schema index such as 'd12', 'd13', etc.\n"
+              ++ "specify predefined schema index such as 's2', 's3', etc.\n"
               ++ "default is 'normal' which stores all values as string.\n"
 help_recursive :: [Char]
 help_recursive = "specify directory to iterate all files in it recursively."
