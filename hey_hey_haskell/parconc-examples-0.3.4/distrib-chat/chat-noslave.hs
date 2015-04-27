@@ -1,6 +1,6 @@
 {-# LANGUAGE TemplateHaskell, DeriveDataTypeable, DeriveGeneric #-}
 {-# LANGUAGE RecordWildCards #-}
-import Control.Distributed.Process hiding (mask, finally)
+import Control.Distributed.Process hiding (mask, finally, Message, handleMessage, proxy)
 import Control.Distributed.Process.Closure
 import Control.Distributed.Process.Backend.SimpleLocalnet
 import Control.Distributed.Process.Node as Node hiding (newLocalNode)
