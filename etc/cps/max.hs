@@ -12,7 +12,7 @@ my_max (x:xs) =
        else
            pre
 
-
+-- CPS!
 cps_max [x] cont = cont x
 cps_max (x:xs) cont = 
     cps_max xs (\pre ->
