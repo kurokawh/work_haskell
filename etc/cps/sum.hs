@@ -13,5 +13,6 @@ my_sum2 (x:xs) =
     in x + pre
 
 -- CPS!
+-- e.g.>  cps_sum [1,2,3] id
 cps_sum [] cont = cont 0 -- NOTE "cont" is needed
 cps_sum (x:xs) cont = cps_sum xs (\y -> cont (x + y))
