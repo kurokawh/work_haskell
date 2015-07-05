@@ -28,6 +28,7 @@ cps_map f (x:xs) cont =
 -}
 
 -- another answer:
+-- http://stackoverflow.com/questions/16682704/haskell-cps-how-to-implement-map-and-filter-functions-using-cont-monad
 cpsMap :: (a -> b) -> [a] -> ([b] -> r) -> r
 cpsMap f (a:as) c = cpsMap f as (c.(f a:))
 cpsMap  _ []    c = c []
