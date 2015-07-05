@@ -17,15 +17,9 @@ my_map2 f (x:xs) =
 --cps_map :: (a -> b) -> [a] -> ([b] -> [b]) -> [b]
 cps_map _ [] cont = cont []
 cps_map f (x:xs) cont =
---    let y = f x
---    in cps_map f xs (cont (\ys -> (y : ys)))
+    cps_map f xs (cont . (\ys -> ((f x) : ys)))
+-- NOTE: following impl does not work (compile error). need "." operator.
 --    cps_map f xs (cont (\ys -> ((f x) : ys)))
-    cont (cps_map f xs (\ys -> ((f x) : ys)))
-
-{- ???
-> cps_map ((+) 1) [1,2,3] id
-> cps_map ((+) 1) [2,3] (id (\fs -> 2 : ys))
--}
 
 -- another answer:
 -- http://stackoverflow.com/questions/16682704/haskell-cps-how-to-implement-map-and-filter-functions-using-cont-monad
