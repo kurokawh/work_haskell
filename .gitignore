@@ -18,3 +18,4 @@ cabal.config
 #*
 .#*
 x.db
+*.svn
