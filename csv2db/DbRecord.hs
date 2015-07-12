@@ -177,7 +177,7 @@ to_s3 f t = DbRecord_s3
 
 
 insert_s2 :: Control.Monad.IO.Class.MonadIO m =>
-             (String, V.Vector DbRecord)
+             (FilePath, V.Vector DbRecord)
              -> Control.Monad.Trans.Reader.ReaderT SqlBackend m ()
 insert_s2 (f, v) = do
               found <- selectList [DbRecord_s2Filename ==. f] [LimitTo 1]
@@ -190,7 +190,7 @@ insert_s2 (f, v) = do
                   -- already parsed: do nothing
                   liftIO (putStrLn ("\tskip because already parsed: " ++ f))
 insert_s3 :: Control.Monad.IO.Class.MonadIO m =>
-             (String, V.Vector DbRecord)
+             (FilePath, V.Vector DbRecord)
              -> Control.Monad.Trans.Reader.ReaderT SqlBackend m ()
 insert_s3 (f, v) = do
               found <- selectList [DbRecord_s3Filename ==. f] [LimitTo 1]
@@ -203,7 +203,7 @@ insert_s3 (f, v) = do
                   -- already parsed: do nothing
                   liftIO (putStrLn ("\tskip because already parsed: " ++ f))
 insert_rec :: Control.Monad.IO.Class.MonadIO m =>
-             (String, V.Vector DbRecord)
+             (FilePath, V.Vector DbRecord)
              -> Control.Monad.Trans.Reader.ReaderT SqlBackend m ()
 insert_rec (f, v) = do
               found <- selectList [DbRecordFilename ==. f] [LimitTo 1]
