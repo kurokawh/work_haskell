@@ -9,32 +9,27 @@
 {-# LANGUAGE TypeSynonymInstances       #-}
 {-# LANGUAGE FlexibleInstances          #-}
 module DbRecord
-    ( DbRecord(..)
-    , DbRecordId     -- only for avoid warning
-    , migrateAll
-    , insert_rec
-    , DbRecord_s2(..)
-    , DbRecord_s2Id -- only for avoid warning
-    , migrateAll_s2
-    , insert_s2
-    , DbRecord_s3(..)
-    , DbRecord_s3Id -- only for avoid warning
-    , migrateAll_s3
-    , insert_s3
+    ( to_sqlite
+    , DbRecordId
+    , DbRecord_s2Id
+    , DbRecord_s3Id
     ) where
 
 import Control.Applicative ((<*>), (<$>))
 import Control.Monad.IO.Class (liftIO, MonadIO)
 import Control.Monad.Trans.Reader  (ReaderT)
 import qualified Data.Vector as V
+import qualified Data.Text as T (pack)
 import Data.Csv
 import Data.String (IsString)
 import Data.ByteString.Char8 (pack, unpack)
 import Database.Persist
 import Database.Persist.TH
-import Database.Persist.Sqlite (SqlBackend)
+import Database.Persist.Sqlite
+--import Database.Persist.Sqlite (SqlBackend)
 import Network.HTTP.Types.URI (urlDecode)
 import FileToVec
+import MyArgs
 
 
 -- return index val or return "" if index is too big.
@@ -223,3 +218,23 @@ insert_rec f = do
               else
                   -- already parsed: do nothing
                   liftIO (putStrLn ("\tskip because already parsed: " ++ f))
+
+
+
+convert_and_insert :: Control.Monad.IO.Class.MonadIO m =>
+                      [a]
+                      -> Migration
+                      -> (a -> Control.Monad.Trans.Reader.ReaderT SqlBackend m b)
+                      -> Control.Monad.Trans.Reader.ReaderT SqlBackend m ()
+convert_and_insert flist migration insertion = do
+      runMigration migration
+      mapM_ insertion flist
+
+-- ToDo remove 2nd argument (vlist).
+to_sqlite :: MyArgs -> [FilePath] -> IO ()
+to_sqlite myargs flist = runSqlite (T.pack $ targetdb myargs) $ 
+  case schema myargs of
+    "s2" -> convert_and_insert flist migrateAll_s2 insert_s2
+    "s3" -> convert_and_insert flist migrateAll_s3 insert_s3
+    "normal" -> convert_and_insert flist migrateAll insert_rec
+    _ -> error "unknown SCHEMA_INDEX."
