@@ -58,7 +58,7 @@ config = MyArgs {
 -- Debug Print: default off
 putStrLnDbg :: String -> IO ()
 --putStrLnDbg s = putStrLn s
-putStrLnDbg s = return ()
+putStrLnDbg _ = return ()
 
 recursive_files :: MyArgs -> IO [String]
 recursive_files myargs
