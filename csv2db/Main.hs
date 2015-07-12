@@ -1,7 +1,6 @@
 {-# LANGUAGE MultiParamTypeClasses      #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 
-import System.FilePath as FP
 import System.Console.CmdArgs
 import Data.Text (pack)
 import Database.Persist.Sqlite
@@ -12,8 +11,7 @@ import DbRecord
 
 
 
---type FileDbRecord = (FilePath, V.Vector DbRecord)
-    
+   
 -- ToDo: remove 2nd argument (vlist).
 dispatch :: [(DbOpt, MyArgs -> [FilePath] -> IO ())]
 dispatch =  [ (SQLite, to_sqlite)
@@ -41,13 +39,12 @@ to_sqlite myargs flist = runSqlite (pack $ targetdb myargs) $
     _ -> error "unknown SCHEMA_INDEX."
 
 
---arg_to_flist :: C.FromRecord a => MyArgs -> IO [FilePath]
+-- return filelist which is given as arguments or
+-- is searched recursively with -r option.
 arg_to_flist :: MyArgs -> IO [FilePath]
 arg_to_flist myargs = do
---  flist <- mapM file_to_vec (csvfiles myargs)
   let flist = csvfiles myargs
   rfiles <- recursive_files myargs
---  rlist <- mapM file_to_vec rfiles
   return (flist ++ rfiles)
 
 main :: IO ()
@@ -59,4 +56,4 @@ main = do
   then
       print myargs
   else
-      to_db myargs flist -- (vlist:: [FileDbRecord])
+      to_db myargs flist

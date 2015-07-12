@@ -28,7 +28,7 @@ file_to_bs file =
     else do
       BL.readFile file
 
---file_to_vec :: C.FromRecord a => FilePath -> IO (V.Vector a)
+-- parse given file and return CSV/TSV vector.
 file_to_vec :: C.FromRecord a => FilePath -> IO (V.Vector a)
 file_to_vec file = do
     putStrLn ("parsing : " ++ file)
