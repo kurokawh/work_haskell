@@ -34,6 +34,8 @@ import Database.Persist
 import Database.Persist.TH
 import Database.Persist.Sqlite (SqlBackend)
 import Network.HTTP.Types.URI (urlDecode)
+import FileToVec
+
 
 -- return index val or return "" if index is too big.
 getval_or_empty :: (FromField a, Data.String.IsString a) =>
@@ -177,40 +179,46 @@ to_s3 f t = DbRecord_s3
 
 
 insert_s2 :: Control.Monad.IO.Class.MonadIO m =>
-             (FilePath, V.Vector DbRecord)
+             FilePath
              -> Control.Monad.Trans.Reader.ReaderT SqlBackend m ()
-insert_s2 (f, v) = do
-              found <- selectList [DbRecord_s2Filename ==. f] [LimitTo 1]
+insert_s2 f = do
+              let fn = file_to_filename f
+              found <- selectList [DbRecord_s2Filename ==. fn] [LimitTo 1]
               if length found == 0
               then do
                   -- not parsed yet
-                  let cv = V.map (to_s2 f) v
+                  v <- liftIO $ file_to_vec f
+                  let cv = V.map (to_s2 fn) v
                   V.mapM_ insert cv
               else
                   -- already parsed: do nothing
                   liftIO (putStrLn ("\tskip because already parsed: " ++ f))
 insert_s3 :: Control.Monad.IO.Class.MonadIO m =>
-             (FilePath, V.Vector DbRecord)
+             FilePath
              -> Control.Monad.Trans.Reader.ReaderT SqlBackend m ()
-insert_s3 (f, v) = do
-              found <- selectList [DbRecord_s3Filename ==. f] [LimitTo 1]
+insert_s3 f = do
+              let fn = file_to_filename f
+              found <- selectList [DbRecord_s3Filename ==. fn] [LimitTo 1]
               if length found == 0
               then do
                   -- not parsed yet
-                  let cv = V.map (to_s3 f) v
+                  v <- liftIO $ file_to_vec f
+                  let cv = V.map (to_s3 fn) v
                   V.mapM_ insert cv
               else
                   -- already parsed: do nothing
                   liftIO (putStrLn ("\tskip because already parsed: " ++ f))
 insert_rec :: Control.Monad.IO.Class.MonadIO m =>
-             (FilePath, V.Vector DbRecord)
+             FilePath
              -> Control.Monad.Trans.Reader.ReaderT SqlBackend m ()
-insert_rec (f, v) = do
-              found <- selectList [DbRecordFilename ==. f] [LimitTo 1]
+insert_rec f = do
+              let fn = file_to_filename f
+              found <- selectList [DbRecordFilename ==. fn] [LimitTo 1]
               if length found == 0
               then do
                   -- not parsed yet
-                  let cv = V.map (to_rec f) v
+                  v <- liftIO $ file_to_vec f
+                  let cv = V.map (to_rec fn) v
                   V.mapM_ insert cv
               else
                   -- already parsed: do nothing
