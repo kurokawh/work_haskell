@@ -7,9 +7,9 @@ import DbRecord
 
 
 
-   
--- ToDo: remove 2nd argument (vlist).
-dispatch :: [(DbOpt, MyArgs -> [FilePath] -> IO ())]
+-- dispacher for each DB.
+-- currently only SQLite is supported.
+dispatch :: [(DbOpt, MyArgs -> IO ())]
 dispatch =  [ (SQLite, to_sqlite)
 --            , (PostgreSQL, to_postgresql)
 --            , (MySQL, to_mysql)
@@ -17,21 +17,8 @@ dispatch =  [ (SQLite, to_sqlite)
 
 
 
--- return filelist which is given as arguments or
--- is searched recursively with -r option.
-arg_to_flist :: MyArgs -> IO [FilePath]
-arg_to_flist myargs = do
-  let flist = csvfiles myargs
-  rfiles <- recursive_files myargs
-  return (flist ++ rfiles)
-
 main :: IO ()
 main = do
   myargs <- cmdArgs config
   let (Just to_db) = lookup (dbopt　myargs) dispatch
-  flist <- arg_to_flist myargs
-  if length flist == 0 
-  then
-      print myargs
-  else
-      to_db myargs flist
+  to_db myargs

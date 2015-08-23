@@ -230,10 +230,11 @@ convert_and_insert flist migration insertion = do
       runMigration migration
       mapM_ insertion flist
 
--- ToDo remove 2nd argument (vlist).
-to_sqlite :: MyArgs -> [FilePath] -> IO ()
-to_sqlite myargs flist = runSqlite (T.pack $ targetdb myargs) $ 
-  case schema myargs of
+-- store all data in given csv files to DB with a specified schema.
+to_sqlite :: MyArgs -> IO ()
+to_sqlite myargs = do
+  flist <- arg_to_flist myargs
+  runSqlite (T.pack $ targetdb myargs) $ case schema myargs of
     "s2" -> convert_and_insert flist migrateAll_s2 insert_s2
     "s3" -> convert_and_insert flist migrateAll_s3 insert_s3
     "normal" -> convert_and_insert flist migrateAll insert_rec

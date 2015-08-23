@@ -9,6 +9,7 @@ module MyArgs
 , csvfiles
 , recursive_files
 , DbOpt(..)
+, arg_to_flist
 ) where
 
 import System.Directory
@@ -106,3 +107,16 @@ operate_abspath abspath
   | otherwise = operate_file_or_dir abspath
   where
     entry = takeFileName abspath
+
+-- return filelist which is given as arguments or
+-- is searched recursively with -r option.
+arg_to_flist :: MyArgs -> IO [FilePath]
+arg_to_flist myargs = do
+  let flist = csvfiles myargs
+  rfiles <- recursive_files myargs
+  let mergedlist = flist ++ rfiles
+  if ((length mergedlist) == 0) then do
+      print myargs
+      error "ERROR: no csv file is specified."
+  else
+      return mergedlist
