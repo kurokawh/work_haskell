@@ -23,7 +23,7 @@ Person
 main :: IO ()
 main = runSqlite "old.db" $ do
     -- this line added: that's it!
-    printMigration migrateAll
+    runMigration migrateAll
     michaelId <- insert $ Person "Michael" 26 "Tokyo"
     michael <- get michaelId
     liftIO $ print michael
