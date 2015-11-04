@@ -172,48 +172,17 @@ to_s3 f t = DbRecord_s3
            (dbRecordP2 t)
 
 
-
-insert_s2 :: Control.Monad.IO.Class.MonadIO m =>
-             FilePath
-             -> Control.Monad.Trans.Reader.ReaderT SqlBackend m ()
-insert_s2 f = do
+--insert_rec :: Control.Monad.IO.Class.MonadIO m =>
+--             FilePath
+--             -> Control.Monad.Trans.Reader.ReaderT SqlBackend m ()
+insertRec fnField recConverter f = do
               let fn = file_to_filename f
-              found <- selectList [DbRecord_s2Filename ==. fn] [LimitTo 1]
+              found <- selectList [fnField ==. fn] [LimitTo 1]
               if length found == 0
               then do
                   -- not parsed yet
                   v <- liftIO $ file_to_vec f
-                  let cv = V.map (to_s2 fn) v
-                  V.mapM_ insert cv
-              else
-                  -- already parsed: do nothing
-                  liftIO (putStrLn ("\tskip because already parsed: " ++ f))
-insert_s3 :: Control.Monad.IO.Class.MonadIO m =>
-             FilePath
-             -> Control.Monad.Trans.Reader.ReaderT SqlBackend m ()
-insert_s3 f = do
-              let fn = file_to_filename f
-              found <- selectList [DbRecord_s3Filename ==. fn] [LimitTo 1]
-              if length found == 0
-              then do
-                  -- not parsed yet
-                  v <- liftIO $ file_to_vec f
-                  let cv = V.map (to_s3 fn) v
-                  V.mapM_ insert cv
-              else
-                  -- already parsed: do nothing
-                  liftIO (putStrLn ("\tskip because already parsed: " ++ f))
-insert_rec :: Control.Monad.IO.Class.MonadIO m =>
-             FilePath
-             -> Control.Monad.Trans.Reader.ReaderT SqlBackend m ()
-insert_rec f = do
-              let fn = file_to_filename f
-              found <- selectList [DbRecordFilename ==. fn] [LimitTo 1]
-              if length found == 0
-              then do
-                  -- not parsed yet
-                  v <- liftIO $ file_to_vec f
-                  let cv = V.map (to_rec fn) v
+                  let cv = V.map (recConverter fn) v
                   V.mapM_ insert cv
               else
                   -- already parsed: do nothing
@@ -235,7 +204,7 @@ to_sqlite :: MyArgs -> IO ()
 to_sqlite myargs = do
   flist <- arg_to_flist myargs
   runSqlite (T.pack $ targetdb myargs) $ case schema myargs of
-    "s2" -> convert_and_insert flist migrateAll_s2 insert_s2
-    "s3" -> convert_and_insert flist migrateAll_s3 insert_s3
-    "normal" -> convert_and_insert flist migrateAll insert_rec
+    "s2" -> convert_and_insert flist migrateAll_s2 (insertRec DbRecord_s2Filename to_s2)
+    "s3" -> convert_and_insert flist migrateAll_s3 (insertRec DbRecord_s3Filename to_s3)
+    "normal" -> convert_and_insert flist migrateAll (insertRec DbRecordFilename to_rec)
     _ -> error "unknown SCHEMA_INDEX."
