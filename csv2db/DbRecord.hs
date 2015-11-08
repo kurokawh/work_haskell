@@ -15,7 +15,7 @@ module DbRecord
     , DbRecord_s3Id
     ) where
 
---import Control.Applicative ((<*>), (<$>)) -- avoid warning on GCH-7.10.2
+import Control.Applicative ((<*>), (<$>)) -- need this line for GHC 7.8.3.
 import Control.Monad.IO.Class (liftIO, MonadIO)
 import Control.Monad.Trans.Reader  (ReaderT)
 import qualified Data.Vector as V
@@ -26,7 +26,6 @@ import Data.ByteString.Char8 (pack, unpack)
 import Database.Persist
 import Database.Persist.TH
 import Database.Persist.Sqlite
---import Database.Persist.Sqlite (SqlBackend)
 import Network.HTTP.Types.URI (urlDecode)
 import FileToVec
 import MyArgs
