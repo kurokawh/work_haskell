@@ -15,7 +15,7 @@ module DbRecord
     , DbRecord_s3Id
     ) where
 
-import Control.Applicative ((<*>), (<$>))
+--import Control.Applicative ((<*>), (<$>)) -- avoid warning on GCH-7.10.2
 import Control.Monad.IO.Class (liftIO, MonadIO)
 import Control.Monad.Trans.Reader  (ReaderT)
 import qualified Data.Vector as V
@@ -172,9 +172,14 @@ to_s3 f t = DbRecord_s3
            (dbRecordP2 t)
 
 
---insert_rec :: Control.Monad.IO.Class.MonadIO m =>
---             FilePath
---             -> Control.Monad.Trans.Reader.ReaderT SqlBackend m ()
+insertRec  :: (FromRecord a, MonadIO m,
+               PersistQuery (PersistEntityBackend val), PersistEntity val,
+               PersistEntity val1,
+               PersistEntityBackend val ~ PersistEntityBackend val1) =>
+              EntityField val FilePath
+           -> (FilePath -> a -> val1)
+           -> FilePath
+           -> ReaderT (PersistEntityBackend val) m ()
 insertRec fnField recConverter f = do
               let fn = file_to_filename f
               found <- selectList [fnField ==. fn] [LimitTo 1]
