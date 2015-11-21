@@ -20,6 +20,8 @@ import qualified Account
 import Account (Account, account, tableOfAccount)
 import qualified TestRec
 import TestRec (TestRec, testRec, tableOfTestRec)  -- NOTE: not test_rec
+import qualified DbRecord
+import DbRecord (DbRecord, dbRecord, tableOfDbRecord)  -- NOTE: not test_rec
 
 import DataSource (connect)
 
@@ -30,6 +32,9 @@ allAccount = relation $ query account
 
 allTestRec :: Relation () TestRec
 allTestRec = relation $ query testRec -- NOTE: not test_rec
+
+allDbRecord :: Relation () DbRecord
+allDbRecord = relation $ query dbRecord -- NOTE: not test_rec
 
 
 --
@@ -83,6 +88,7 @@ runD conn param dlt = do
 
 main :: IO ()
 main = handleSqlError' $ withConnectionIO (connect "hrr.db") $ \conn -> do
+  run conn () allDbRecord
   run conn () allAccount
   run conn () allTestRec
   putStrLn $ "SQL: " ++ show allAccount

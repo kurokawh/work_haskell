@@ -43,6 +43,8 @@ executable reporter
   main-is:             Reporter.hs
   other-modules:       DataSource
                      , Account
+                     , TestRec
+                     , DbRecord
   build-depends:       base <5
                      , HDBC
                      , HDBC-session
