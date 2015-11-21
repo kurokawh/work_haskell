@@ -18,6 +18,8 @@ import Data.Time (Day, LocalTime)
 
 import qualified Account
 import Account (Account, account, tableOfAccount)
+import qualified TestRec
+import TestRec (TestRec, testRec, tableOfTestRec)  -- NOTE: not test_rec
 
 import DataSource (connect)
 
@@ -26,6 +28,8 @@ import Prelude hiding (product)
 allAccount :: Relation () Account
 allAccount = relation $ query account
 
+allTestRec :: Relation () TestRec
+allTestRec = relation $ query testRec -- NOTE: not test_rec
 
 
 --
@@ -78,7 +82,8 @@ runD conn param dlt = do
   rollback conn
 
 main :: IO ()
-main = handleSqlError' $ withConnectionIO (connect "x.db") $ \conn -> do
+main = handleSqlError' $ withConnectionIO (connect "hrr.db") $ \conn -> do
   run conn () allAccount
+  run conn () allTestRec
   putStrLn $ "SQL: " ++ show allAccount
 

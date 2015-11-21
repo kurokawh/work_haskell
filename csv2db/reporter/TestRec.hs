@@ -1,7 +1,7 @@
 {-# LANGUAGE TemplateHaskell, MultiParamTypeClasses, FlexibleInstances #-}
 
-module Account where
+module TestRec where
 
 import DataSource (defineTable)
 
-$(defineTable "hrr.db" "account")
+$(defineTable "hrr.db" "test_rec")

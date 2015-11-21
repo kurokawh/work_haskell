@@ -853,6 +853,7 @@ deleteAccount_o2P = derivedDelete $ \proj -> do
 --   FROM MAIN.employee T0 WHERE (T0.dept_id = dept_id))))
 -- @
 --
+{-
 deleteEmployee_9_4_2 :: Delete ()
 deleteEmployee_9_4_2 = typedDelete tableOfDepartment . restriction $ \proj -> do
   el <- queryList $ relation $ do
@@ -860,7 +861,7 @@ deleteEmployee_9_4_2 = typedDelete tableOfDepartment . restriction $ \proj -> do
     wheres $ e ! Employee.deptId' .=. just (proj ! Department.deptId')
     return (value (1 :: Int64))
   wheres $ not' . exists $ el
-
+-}
 -- |
 -- (original) Updating data
 --
@@ -937,6 +938,7 @@ updateEmployee_o3P = derivedUpdate $ \proj -> do
 --   (T2.account_id = account_id)))
 -- @
 --
+{-
 updateAccount_9_4_2 :: Update ()
 updateAccount_9_4_2 = typedUpdate tableOfAccount . updateTarget $ \proj -> do
   ts <- queryScalar $ aggregatedUnique (relation $ do
@@ -953,7 +955,7 @@ updateAccount_9_4_2 = typedUpdate tableOfAccount . updateTarget $ \proj -> do
 
 toDay :: (SqlProjectable p, ProjectableShowSql p) => p (Maybe LocalTime) -> p (Maybe Day)
 toDay dt = unsafeProjectSql $ "date(" ++ unsafeShowSql dt ++ ")"
-
+-}
 -- |
 -- (from script) The insert statement
 --
@@ -1300,10 +1302,10 @@ main = handleSqlError' $ withConnectionIO connect $ \conn -> do
   runD conn 2 deleteAccount_o1P
   runD conn () deleteAccount_o2
   runD conn (10,20) deleteAccount_o2P
-  runD conn () deleteEmployee_9_4_2
+--  runD conn () deleteEmployee_9_4_2
   runU conn () updateEmployee_o3
   runU conn (("Bush",3),10) updateEmployee_o3P
-  runU conn () updateAccount_9_4_2
+--  runU conn () updateAccount_9_4_2
   runIQ conn () insertBranch_s1
   runI conn branch1 insertBranch_s1P
   runIQ conn () insertEmployee_s2
