@@ -70,10 +70,18 @@ main_select = do
   -- 結果として得た Entity のリストを順に表示
   liftIO $ mapM print found
 
-main_rawsql = do                       
+main_rawQuery = do
   -- 名前が"y"で終端するPersonを検索
   let sql = "SELECT name FROM Person WHERE name LIKE '%y'"
   rawQuery sql [] $$ CL.mapM_ (liftIO . print)
+  return ()
+
+{-
+main_rawsql = do
+  -- 名前が"y"で終端するPersonを検索
+  let sql = "SELECT name FROM Person WHERE name LIKE '%y'"
+  rawSql sql [] $$ CL.mapM_ (liftIO . print)
+-}
 
 main :: IO ()
 main = runSqlite ":memory:" $ do
@@ -81,8 +89,14 @@ main = runSqlite ":memory:" $ do
     ids <- mapM insert person_list
     liftIO $ print ids
 
+    liftIO $ putStrLn "*** call main_get ***"
     main_get
+    liftIO $ putStrLn "*** call main_getBy ***"
     main_getBy
+    liftIO $ putStrLn "*** call main_selectt ***"
     main_select
-    main_rawsql
+    liftIO $ putStrLn "*** call main_rawQuery ***"
+    main_rawQuery
+--    liftIO $ putStrLn "*** call main_rawsql ***"
+--    main_rawsql
     return ()
