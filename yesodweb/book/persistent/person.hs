@@ -1,10 +1,12 @@
-{-# LANGUAGE EmptyDataDecls    #-}
-{-# LANGUAGE FlexibleContexts  #-}
-{-# LANGUAGE GADTs             #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE QuasiQuotes       #-}
-{-# LANGUAGE TemplateHaskell   #-}
-{-# LANGUAGE TypeFamilies      #-}
+{-# LANGUAGE EmptyDataDecls             #-}
+{-# LANGUAGE FlexibleContexts           #-}
+{-# LANGUAGE GADTs                      #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE MultiParamTypeClasses      #-}
+{-# LANGUAGE OverloadedStrings          #-}
+{-# LANGUAGE QuasiQuotes                #-}
+{-# LANGUAGE TemplateHaskell            #-}
+{-# LANGUAGE TypeFamilies               #-}
 import Control.Monad.IO.Class  (liftIO)
 import Database.Persist
 import Database.Persist.Sqlite
@@ -35,11 +37,11 @@ person_list = [(Person "Michael" 26 Male),
 
 main_get = do
   -- success to refer Michael
-  michael <- get (Key (PersistInt64 1) :: Key (PersonGeneric SqlBackend))
+  michael <- get (PersonKey 1)
   liftIO $ print michael
   -- fail to get with id. Nothing is returned
-  noone <- get (Key (PersistInt64 100) :: Key (PersonGeneric SqlBackend))
-  liftIO $ print noone
+  none <- get (PersonKey 100)
+  liftIO $ print none
 
 --print_entity :: x -> IO ()
 print_entity Nothing = do
@@ -69,7 +71,7 @@ main_select = do
   liftIO $ mapM print found
 
 main_rawsql = do                       
-  -- 名前が"y"で愁嘆するPersonを検索
+  -- 名前が"y"で終端するPersonを検索
   let sql = "SELECT name FROM Person WHERE name LIKE '%y'"
   rawQuery sql [] $$ CL.mapM_ (liftIO . print)
 
