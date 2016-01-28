@@ -193,14 +193,25 @@ insertRec fnField recConverter f = do
                   liftIO (putStrLn ("\tskip because already parsed: " ++ f))
 
 
+data DbDef = DbDef Migration String
+dbdef2 :: DbDef
+dbdef2 = DbDef migrateAll_s2 "_s2" -- XXX: replace with DbRecord_s2Filename
+dbdef3 :: DbDef
+dbdef3 = DbDef migrateAll_s3 "_s3" -- XXX: replace with DbRecord_s3Filename
+dbdefN :: DbDef
+dbdefN = DbDef migrateAll "" -- XXX: replace with DbRecordFilename
+
+
 
 convert_and_insert :: Control.Monad.IO.Class.MonadIO m =>
                       [a]
-                      -> Migration
+--                      -> Migration
+                      -> DbDef
                       -> (a -> Control.Monad.Trans.Reader.ReaderT SqlBackend m b)
                       -> Control.Monad.Trans.Reader.ReaderT SqlBackend m ()
-convert_and_insert flist migration insertion = do
+convert_and_insert flist (DbDef migration sName) insertion = do
       runMigration migration
+      rawExecute (T.pack ("CREATE INDEX IF NOT EXISTS idx_filename_on_dbr" ++ sName ++ " ON db_record" ++ sName ++ "(filename);")) [] -- create index
       mapM_ insertion flist
 
 -- store all data in given csv files to DB with a specified schema.
@@ -208,7 +219,7 @@ to_sqlite :: MyArgs -> IO ()
 to_sqlite myargs = do
   flist <- arg_to_flist myargs
   runSqlite (T.pack $ targetdb myargs) $ case schema myargs of
-    "s2" -> convert_and_insert flist migrateAll_s2 (insertRec DbRecord_s2Filename to_s2)
-    "s3" -> convert_and_insert flist migrateAll_s3 (insertRec DbRecord_s3Filename to_s3)
-    "normal" -> convert_and_insert flist migrateAll (insertRec DbRecordFilename to_rec)
+    "s2" -> convert_and_insert flist dbdef2 (insertRec DbRecord_s2Filename to_s2)
+    "s3" -> convert_and_insert flist dbdef3 (insertRec DbRecord_s3Filename to_s3)
+    "normal" -> convert_and_insert flist dbdefN (insertRec DbRecordFilename to_rec)
     _ -> error "unknown SCHEMA_INDEX."
