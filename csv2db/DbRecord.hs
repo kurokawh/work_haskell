@@ -200,14 +200,17 @@ dbdef3 = (migrateAll_s3, "_s3", DbRecord_s3Filename, to_s3)
 dbdefN = (migrateAll, "", DbRecordFilename, to_rec)
 
 
-{-
-convert_and_insert :: Control.Monad.IO.Class.MonadIO m =>
-                      [a]
---                      -> Migration
-                      -> DbDef
-                      -> (a -> Control.Monad.Trans.Reader.ReaderT SqlBackend m b)
-                      -> Control.Monad.Trans.Reader.ReaderT SqlBackend m ()
--}
+convert_and_insert :: (Foldable t, FromRecord a, MonadIO m,
+                       PersistQuery (PersistEntityBackend val), PersistEntity val,
+                       PersistEntity val1,
+                       PersistEntityBackend val ~ PersistEntityBackend val1,
+                       PersistEntityBackend val ~ SqlBackend) =>
+                      t FilePath
+                   -> (Migration,
+                       String,
+                       EntityField val FilePath,
+                       FilePath -> a -> val1)
+                   -> ReaderT SqlBackend m ()
 convert_and_insert flist (migration, sName, field, to_s) = do
       runMigration migration
       rawExecute (T.pack ("CREATE INDEX IF NOT EXISTS idx_filename_on_dbr" ++ sName ++ " ON db_record" ++ sName ++ "(filename);")) [] -- create index
