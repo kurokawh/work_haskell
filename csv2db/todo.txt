@@ -1,0 +1,6 @@
+ToDo
+- DbRecord
+  - replace dbdefX with schemaToDef
+    but it fails to "Could not deduce" error.
+    - given (parameter of function) type is OK
+    - returned type cannot be deducted ?

@@ -192,13 +192,26 @@ insertRec fnField recConverter f = do
                   -- already parsed: do nothing
                   liftIO (putStrLn ("\tskip because already parsed: " ++ f))
 
-
 --data DbDef = DbDef Migration String
---dbdef2 :: DbDef
+dbdef2 :: (Migration, String, EntityField DbRecord_s2 String, String -> DbRecord -> DbRecord_s2)
 dbdef2 = (migrateAll_s2, "_s2", DbRecord_s2Filename, to_s2)
+dbdef3 :: (Migration, String, EntityField DbRecord_s3 String, String -> DbRecord -> DbRecord_s3)
 dbdef3 = (migrateAll_s3, "_s3", DbRecord_s3Filename, to_s3)
+dbdefN :: (Migration, String, EntityField DbRecord String, String -> DbRecord -> DbRecord)
 dbdefN = (migrateAll, "", DbRecordFilename, to_rec)
 
+{-
+schemaToDef :: (FromRecord a, MonadIO m,
+                PersistQuery (PersistEntityBackend val), PersistEntity val,
+                PersistEntity val1,
+                PersistEntityBackend val ~ PersistEntityBackend val1) =>
+               String
+            -> (Migration, String, (EntityField val FilePath), (FilePath -> a -> val1))
+schemaToDef "s2" = dbdef2 --(migrateAll_s2, "_s2", DbRecord_s2Filename, to_s2)
+schemaToDef "s3" = dbdef3 --(migrateAll_s3, "_s3", DbRecord_s3Filename, to_s3)
+schemaToDef "normal" = dbdefN --(migrateAll, "", DbRecordFilename, to_rec)
+schemaToDef _  = error "unknown SCHEMA_INDEX."
+-}
 
 convert_and_insert :: (Foldable t, FromRecord a, MonadIO m,
                        PersistQuery (PersistEntityBackend val), PersistEntity val,
@@ -225,3 +238,5 @@ to_sqlite myargs = do
     "s3" -> convert_and_insert flist dbdef3
     "normal" -> convert_and_insert flist dbdefN
     _ -> error "unknown SCHEMA_INDEX."
+--  runSqlite (T.pack $ targetdb myargs) $ convert_and_insert flist (schemaToDef (schema myargs))
+
