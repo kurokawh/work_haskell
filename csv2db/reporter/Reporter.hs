@@ -36,6 +36,12 @@ allTestRec = relation $ query testRec -- NOTE: not test_rec
 allDbRecord :: Relation () DbRecord
 allDbRecord = relation $ query dbRecord -- NOTE: not test_rec
 
+selectDbRecord :: Relation () DbRecord
+selectDbRecord = relation $ do
+                a <- query dbRecord
+                wheres $ a ! DbRecord.id' .=. just (value 1)
+                return a
+
 
 --
 -- run and print sql
@@ -50,45 +56,11 @@ run conn param rel = do
   putStrLn ""
   rollback conn
 
-runI :: (IConnection conn, ToSql SqlValue p)
-     => conn -> p -> Insert p -> IO ()
-runI conn param ins = do
-  putStrLn $ "SQL: " ++ show ins
-  num <- runInsert conn ins param
-  print num
-  putStrLn ""
-  rollback conn
-
-runIQ :: (IConnection conn, ToSql SqlValue p)
-     => conn -> p -> InsertQuery p -> IO ()
-runIQ conn param ins = do
-  putStrLn $ "SQL: " ++ show ins
-  num <- runInsertQuery conn ins param
-  print num
-  putStrLn ""
-  rollback conn
-
-runU :: (IConnection conn, ToSql SqlValue p)
-     => conn -> p -> Update p -> IO ()
-runU conn param upd = do
-  putStrLn $ "SQL: " ++ show upd
-  num <- runUpdate conn upd param
-  print num
-  putStrLn ""
-  rollback conn
-
-runD :: (IConnection conn, ToSql SqlValue p)
-     => conn -> p -> Delete p -> IO ()
-runD conn param dlt = do
-  putStrLn $ "SQL: " ++ show dlt
-  num <- runDelete conn dlt param
-  print num
-  putStrLn ""
-  rollback conn
 
 main :: IO ()
 main = handleSqlError' $ withConnectionIO (connect "hrr.db") $ \conn -> do
-  run conn () allDbRecord
+--  run conn () allDbRecord
+  run conn () selectDbRecord
   run conn () allAccount
   run conn () allTestRec
   putStrLn $ "SQL: " ++ show allAccount
