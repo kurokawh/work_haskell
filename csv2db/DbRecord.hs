@@ -172,11 +172,9 @@ to_s3 f t = DbRecord_s3
 
 
 insertRec  :: (FromRecord a, MonadIO m,
-               PersistQuery (PersistEntityBackend val), PersistEntity val,
-               PersistEntity val1,
-               PersistEntityBackend val ~ PersistEntityBackend val1) =>
+               PersistQuery (PersistEntityBackend val), PersistEntity val) =>
               EntityField val FilePath
-           -> (FilePath -> a -> val1)
+           -> (FilePath -> a -> val)
            -> FilePath
            -> ReaderT (PersistEntityBackend val) m ()
 insertRec fnField recConverter f = do
@@ -215,14 +213,12 @@ schemaToDef _  = error "unknown SCHEMA_INDEX."
 
 convert_and_insert :: (Foldable t, FromRecord a, MonadIO m,
                        PersistQuery (PersistEntityBackend val), PersistEntity val,
-                       PersistEntity val1,
-                       PersistEntityBackend val ~ PersistEntityBackend val1,
                        PersistEntityBackend val ~ SqlBackend) =>
                       t FilePath
                    -> (Migration,
                        String,
                        EntityField val FilePath,
-                       FilePath -> a -> val1)
+                       FilePath -> a -> val)
                    -> ReaderT SqlBackend m ()
 convert_and_insert flist (migration, sName, field, to_s) = do
       runMigration migration
