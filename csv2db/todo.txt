@@ -4,3 +4,101 @@ ToDo
     but it fails to "Could not deduce" error.
     - given (parameter of function) type is OK
     - returned type cannot be deducted ?
+
+*DbRecord> :t DbRecord_s2Filename
+DbRecord_s2Filename :: EntityField DbRecord_s2 String
+
+*DbRecord> :i EntityField
+class (PersistField (Key record),
+       aeson-0.9.0.1:Data.Aeson.Types.Class.ToJSON (Key record),
+       aeson-0.9.0.1:Data.Aeson.Types.Class.FromJSON (Key record),
+       Show (Key record), Read (Key record), Eq (Key record),
+       Ord (Key record)) =>
+      PersistEntity record where
+  ...
+  type role EntityField nominal nominal
+  data family EntityField record a
+  ...
+  ...
+        -- Defined in ‘persistent-2.2.4:Database.Persist.Class.PersistEntity’
+data instance EntityField DbRecord typ where
+  DbRecordId :: typ ~ Key DbRecord => EntityField DbRecord typ
+  DbRecordFilename :: typ ~ String => EntityField DbRecord typ
+  DbRecordP1 :: typ ~ String => EntityField DbRecord typ
+  DbRecordP2 :: typ ~ String => EntityField DbRecord typ
+  DbRecordP3 :: typ ~ String => EntityField DbRecord typ
+  DbRecordP4 :: typ ~ String => EntityField DbRecord typ
+  DbRecordP5 :: typ ~ String => EntityField DbRecord typ
+  DbRecordP6 :: typ ~ String => EntityField DbRecord typ
+  DbRecordP7 :: typ ~ String => EntityField DbRecord typ
+  DbRecordP8 :: typ ~ String => EntityField DbRecord typ
+  DbRecordP9 :: typ ~ String => EntityField DbRecord typ
+  DbRecordP10 :: typ ~ String => EntityField DbRecord typ
+  DbRecordP11 :: typ ~ String => EntityField DbRecord typ
+  DbRecordP12 :: typ ~ String => EntityField DbRecord typ
+  DbRecordP13 :: typ ~ String => EntityField DbRecord typ
+  DbRecordP14 :: typ ~ String => EntityField DbRecord typ
+  DbRecordP15 :: typ ~ String => EntityField DbRecord typ
+  DbRecordP16 :: typ ~ String => EntityField DbRecord typ
+  DbRecordP17 :: typ ~ String => EntityField DbRecord typ
+  DbRecordP18 :: typ ~ String => EntityField DbRecord typ
+  DbRecordP19 :: typ ~ String => EntityField DbRecord typ
+  DbRecordP20 :: typ ~ String => EntityField DbRecord typ
+        -- Defined at DbRecord.hs:64:1
+data instance EntityField DbRecord_s2 typ where
+  DbRecord_s2Id :: typ ~ Key DbRecord_s2 =>
+                   EntityField DbRecord_s2 typ
+  DbRecord_s2Filename :: typ ~ String => EntityField DbRecord_s2 typ
+  DbRecord_s2Contry :: typ ~ String => EntityField DbRecord_s2 typ
+  DbRecord_s2Region :: typ ~ String => EntityField DbRecord_s2 typ
+  DbRecord_s2Age :: typ ~ Int => EntityField DbRecord_s2 typ
+  DbRecord_s2Name :: typ ~ String => EntityField DbRecord_s2 typ
+        -- Defined at DbRecord.hs:140:1
+data instance EntityField DbRecord_s3 typ where
+  DbRecord_s3Id :: typ ~ Key DbRecord_s3 =>
+                   EntityField DbRecord_s3 typ
+  DbRecord_s3Filename :: typ ~ String => EntityField DbRecord_s3 typ
+  DbRecord_s3Contry :: typ ~ String => EntityField DbRecord_s3 typ
+  DbRecord_s3Name :: typ ~ String => EntityField DbRecord_s3 typ
+        -- Defined at DbRecord.hs:159:1
+
+*DbRecord> :i DbRecord_s2
+data DbRecord_s2
+  = DbRecord_s2 {dbRecord_s2Filename :: !String,
+                 dbRecord_s2Contry :: !String,
+                 dbRecord_s2Region :: !String,
+                 dbRecord_s2Age :: !Int,
+                 dbRecord_s2Name :: !String}
+        -- Defined at DbRecord.hs:140:1
+instance Eq DbRecord_s2 -- Defined at DbRecord.hs:140:1
+instance Eq (Key DbRecord_s2) -- Defined at DbRecord.hs:140:1
+instance Ord (Key DbRecord_s2) -- Defined at DbRecord.hs:140:1
+instance Read (Key DbRecord_s2) -- Defined at DbRecord.hs:140:1
+instance Show DbRecord_s2 -- Defined at DbRecord.hs:140:1
+instance Show (Key DbRecord_s2) -- Defined at DbRecord.hs:140:1
+instance ToBackendKey SqlBackend DbRecord_s2
+  -- Defined at DbRecord.hs:140:1
+instance PersistField DbRecord_s2 -- Defined at DbRecord.hs:140:1
+instance PersistField (Key DbRecord_s2)
+  -- Defined at DbRecord.hs:140:1
+instance PersistEntity DbRecord_s2 -- Defined at DbRecord.hs:140:1
+instance PersistFieldSql DbRecord_s2
+  -- Defined at DbRecord.hs:140:1
+instance PersistFieldSql (Key DbRecord_s2)
+  -- Defined at DbRecord.hs:140:1
+data instance Unique DbRecord_s2        -- Defined at DbRecord.hs:140:1
+type instance PersistEntityBackend DbRecord_s2 = SqlBackend
+        -- Defined at DbRecord.hs:140:1
+newtype instance Key DbRecord_s2
+  = DbRecord_s2Key {unDbRecord_s2Key :: BackendKey SqlBackend}
+        -- Defined at DbRecord.hs:140:1
+data instance EntityField DbRecord_s2 typ where
+  DbRecord_s2Id :: typ ~ Key DbRecord_s2 =>
+                   EntityField DbRecord_s2 typ
+  DbRecord_s2Filename :: typ ~ String => EntityField DbRecord_s2 typ
+  DbRecord_s2Contry :: typ ~ String => EntityField DbRecord_s2 typ
+  DbRecord_s2Region :: typ ~ String => EntityField DbRecord_s2 typ
+  DbRecord_s2Age :: typ ~ Int => EntityField DbRecord_s2 typ
+  DbRecord_s2Name :: typ ~ String => EntityField DbRecord_s2 typ
+        -- Defined at DbRecord.hs:140:1
+
