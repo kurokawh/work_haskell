@@ -9,6 +9,7 @@ data MyArgs = MyArgs {
     , recursive :: String
     , targetdb :: String
     , csvfiles :: [String]
+    , color :: Bool
     } deriving (Data,Typeable,Show)
 
 help_dbopt = "specify DB type. default DB is 'sqlite'.\n"
@@ -19,7 +20,8 @@ help_schema = "specify table type.\n"
 help_recursive = "specify directory to iterate all files in it recursively."
 help_targetdb = "specify DB file/connection name."
 help_csvfiles = "specify one ore more csv files.\n"
-	        ++ "one file must be specified at the minimum."
+              ++ "one file must be specified at the minimum."
+help_color = "enable colored output."
 help_program = "parse CSV files and store all data into DB.\n"
                ++ "TARGET_DB is the mandatory argument."
 
@@ -29,6 +31,7 @@ config = MyArgs {
     , recursive = def &= typ "RECURSIVE_DIR" &= help help_recursive
     , targetdb  = def &= typ "TARGET_DB" &= argPos 0 -- &= help help_targetdb
     , csvfiles = def &= typ "CSV_FILES" &= args -- &= help help_csvfiles
-} &= program "csv2db" &= help help_program
+    , color = def &= name "c" &= help help_color
+} &= verbosity &= program "MyArgs" &= help help_program
 
 main = print =<< cmdArgs config
