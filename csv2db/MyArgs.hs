@@ -7,7 +7,6 @@ module MyArgs
 , schema
 , targetdb
 , csvfiles
-, recursive_files
 , DbOpt(..)
 , arg_to_flist
 ) where
@@ -23,7 +22,7 @@ data DbOpt = SQLite
 data MyArgs = MyArgs {
       dbopt    :: DbOpt
     , schema   :: String
-    , recursive :: String
+    , recursive :: Bool
     , targetdb :: String
     , csvfiles :: [String]
     } deriving (Data,Typeable,Show)
@@ -36,7 +35,7 @@ help_schema = "specify table name.\n"
               ++ "specify predefined schema index such as 's2', 's3', etc.\n"
               ++ "default is 'normal' which stores all values as string.\n"
 help_recursive :: [Char]
-help_recursive = "specify directory to iterate all files in it recursively."
+help_recursive = "parse files recursively."
 --help_targetdb :: [Char]
 --help_targetdb = "specify DB file for sqlite."
 --help_csvfiles :: [Char]
@@ -50,7 +49,7 @@ config :: MyArgs
 config = MyArgs {
       dbopt   = SQLite &= typ "TARGET_DB_TYPE" &= help help_dbopt
     , schema  = "normal" &= typ "SCHEMA_INDEX" &= help help_schema
-    , recursive = "" &= typ "RECURSIVE_DIR" &= help help_recursive
+    , recursive = def &= name "r" &= help help_recursive
     , targetdb  = def &= typ "TARGET_DB" &= argPos 0 -- &= help help_targetdb
     , csvfiles = def &= typ "CSV_FILES" &= args -- &= help help_csvfiles
 } &= program "csv2db" &= help help_program
@@ -61,14 +60,7 @@ putStrLnDbg :: String -> IO ()
 --putStrLnDbg s = putStrLn s
 putStrLnDbg _ = return ()
 
-recursive_files :: MyArgs -> IO [String]
-recursive_files myargs
-  | dir == "" = return [] -- recursive option is not set
-  | otherwise = operate_dir dir
-  where
-    dir = recursive myargs
-
-operate_dir :: FilePath -> IO ([FilePath])
+operate_dir :: FilePath -> IO [FilePath]
 operate_dir dir = do
   putStrLnDbg $ "operate_dir dir: " ++ dir
   if (takeFileName dir) == ".." then do
@@ -82,7 +74,7 @@ operate_dir dir = do
     putStrLnDbg $ "\toperate_dir: fll: " ++ show filell
     return $ concat filell
 
-operate_file :: FilePath -> IO ([FilePath])
+operate_file :: FilePath -> IO [FilePath]
 operate_file file = do
   putStrLnDbg $ "operate_file file: " ++ file
   if (takeFileName file) == "." then do
@@ -92,7 +84,7 @@ operate_file file = do
     putStrLnDbg ("[f]: " ++ file)
     return [file]
 
-operate_file_or_dir :: FilePath -> IO ([FilePath])
+operate_file_or_dir :: FilePath -> IO [FilePath]
 operate_file_or_dir entry = do
   isdir <- doesDirectoryExist entry
   if isdir then
@@ -100,7 +92,7 @@ operate_file_or_dir entry = do
   else
     operate_file entry
 
-operate_abspath :: FilePath -> IO ([FilePath])
+operate_abspath :: FilePath -> IO [FilePath]
 operate_abspath abspath
   | entry == ".." = return []
   | entry == "." = return []
@@ -112,11 +104,16 @@ operate_abspath abspath
 -- is searched recursively with -r option.
 arg_to_flist :: MyArgs -> IO [FilePath]
 arg_to_flist myargs = do
-  let flist = csvfiles myargs
-  rfiles <- recursive_files myargs
-  let mergedlist = flist ++ rfiles
-  if ((length mergedlist) == 0) then do
+  if (recursive myargs) then do
+    extracted_files <- mapM operate_file_or_dir (csvfiles myargs)
+    return $ concat extracted_files
+  else do
+    return $ csvfiles myargs
+
+check_flist :: MyArgs -> [FilePath] -> IO ()
+check_flist myargs flist = 
+  if ((length flist) == 0) then do
       print myargs
       error "ERROR: no csv file is specified."
   else
-      return mergedlist
+      return ()
