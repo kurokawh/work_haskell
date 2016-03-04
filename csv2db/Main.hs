@@ -20,5 +20,5 @@ dispatch =  [ (SQLite, to_sqlite)
 main :: IO ()
 main = do
   myargs <- cmdArgs config
-  let (Just to_db) = lookup (dbopt　myargs) dispatch
+  let (Just to_db) = lookup (dbopt myargs) dispatch
   to_db myargs
