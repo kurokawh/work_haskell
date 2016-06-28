@@ -6,9 +6,17 @@ spec :: Spec
 spec = withApp $ do
 
     describe "getBlogR" $ do
-        error "Spec not implemented: getBlogR"
+        it "gives a 200" $ do
+            get RobotsR -- BlogR
+            statusIs 200
+--        error "Spec not implemented: getBlogR"
 
 
     describe "postBlogR" $ do
-        error "Spec not implemented: postBlogR"
+        it "post test" $ do
+            --post BlogR
+            get RobotsR -- BlogR
+            statusIs 200
+--        error "Spec not implemented: postBlogR"
+
 

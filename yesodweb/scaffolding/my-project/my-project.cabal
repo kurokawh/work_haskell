@@ -106,6 +106,9 @@ test-suite test
                        Handler.CommonSpec
                        Handler.HomeSpec
                        Handler.EchoSpec
+                       Handler.MirrorSpec
+                       Handler.BlogSpec
+                       Handler.ArticleSpec
                        TestImport
     hs-source-dirs:    test
     ghc-options:       -Wall

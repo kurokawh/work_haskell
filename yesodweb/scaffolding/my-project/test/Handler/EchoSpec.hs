@@ -6,5 +6,8 @@ spec :: Spec
 spec = withApp $ do
 
     describe "getEchoR" $ do
-        error "Spec not implemented: getEchoR"
+        it "gives a 200" $ do
+            get (EchoR "foo")
+            statusIs 200
+--        error "Spec not implemented: getEchoR"
 
