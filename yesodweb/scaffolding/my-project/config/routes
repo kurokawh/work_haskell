@@ -7,4 +7,4 @@
 / HomeR GET POST
 
 /comments CommentR POST
-/echo/#String EchoR GET
+/echo/#Text EchoR GET

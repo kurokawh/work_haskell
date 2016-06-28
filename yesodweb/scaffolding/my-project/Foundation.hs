@@ -1,5 +1,6 @@
 module Foundation where
 
+import Data.Text
 import Import.NoFoundation
 import Database.Persist.Sql (ConnectionPool, runSqlPool)
 import Text.Hamlet          (hamletFile)
