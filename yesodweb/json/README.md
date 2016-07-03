@@ -2,12 +2,30 @@ target urls:
 1. Writing JSON APIs with Yesod
    https://pbrisbin.com/posts/writing_json_apis_with_yesod/
 
+   posts
    - post a new post:
-   % curl -v -H "Accept: application/json" -H "Content-type: application/json" -X POST -d '{"title" : "this is a title.", "content" : "this is a content."}' http://localhost:3000/posts
+     % curl -v -H "Accept: application/json" -H "Content-type: application/json" -X POST -d '{"title" : "this is a title.", "content" : "this is a content."}' http://localhost:3000/posts
    - get all posts:
-   % curl -v -H "Accept: application/json" http://localhost:3000/posts
+     % curl -v -H "Accept: application/json" http://localhost:3000/posts
    - get one post with ID:
-   % curl -v -H "Accept: application/json" http://localhost:3000/posts/1
+     % curl -v -H "Accept: application/json" http://localhost:3000/posts/1
+   - update a post with ID:
+     % curl -v -H "Accept: application/json" -H "Content-type: application/json" -X PUT -d '{"title" : "updated title.", "content" : "updated content."}' http://localhost:3000/posts/1
+   - delete a post with ID:
+     % curl -v -H "Accept: application/json" -X DELETE http://localhost:3000/posts/1
+
+   comments
+   - post a new comment.
+     % curl -v -H "Accept: application/json" -H "Content-type: application/json" -X POST -d '{"post" : 2, "content" : "this is a comment."}' http://localhost:3000/posts/2/comments
+     NOTE: post new comment with not existing post id should have failed...
+   - get all comments
+     % curl -v -H "Accept: application/json" http://localhost:3000/posts/2/comments
+   - get a comment with comment id.
+     % curl -v -H "Accept: application/json" http://localhost:3000/posts/2/comments/1
+   - update a comment with comment id.
+     % curl -v -H "Accept: application/json" -H "Content-type: application/json" -X PUT -d '{"post" : 2, "content" : "this is a updated comment."}' http://localhost:3000/posts/2/comments/1
+   - delete a comment with ID:
+     % curl -v -H "Accept: application/json" -X DELETE http://localhost:3000/posts/2/comments/1
 
 
 2. RESTful Content
