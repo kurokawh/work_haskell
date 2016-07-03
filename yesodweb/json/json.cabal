@@ -23,6 +23,10 @@ library
                      Handler.Common
                      Handler.Home
                      Handler.Comment
+                     Handler.Comments
+                     Handler.Posts
+                     Handler.Post
+                     Helpers.Comment
 
     if flag(dev) || flag(library-only)
         cpp-options:   -DDEVELOPMENT
@@ -84,6 +88,7 @@ library
                  , time
                  , case-insensitive
                  , wai
+                 , http-types
 
 executable         json
     if flag(library-only)
