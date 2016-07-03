@@ -16,14 +16,16 @@ target urls:
 
    comments
    - post a new comment.
-     % curl -v -H "Accept: application/json" -H "Content-type: application/json" -X POST -d '{"post" : 2, "content" : "this is a comment."}' http://localhost:3000/posts/2/comments
+     % curl -v -H "Accept: application/json" -H "Content-type: application/json" -X POST -d '{"content" : "this is a comment."}' http://localhost:3000/posts/2/comments
+     MEMO: "post" field is not needed in JSON data because it is written in URL.
      NOTE: post new comment with not existing post id should have failed...
    - get all comments
      % curl -v -H "Accept: application/json" http://localhost:3000/posts/2/comments
    - get a comment with comment id.
      % curl -v -H "Accept: application/json" http://localhost:3000/posts/2/comments/1
    - update a comment with comment id.
-     % curl -v -H "Accept: application/json" -H "Content-type: application/json" -X PUT -d '{"post" : 2, "content" : "this is a updated comment."}' http://localhost:3000/posts/2/comments/1
+     % curl -v -H "Accept: application/json" -H "Content-type: application/json" -X PUT -d '{"content" : "this is a updated comment."}' http://localhost:3000/posts/2/comments/1
+     MEMO: "post" field is not needed in JSON data because it is written in URL.
    - delete a comment with ID:
      % curl -v -H "Accept: application/json" -X DELETE http://localhost:3000/posts/2/comments/1
 
