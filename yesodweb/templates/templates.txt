@@ -1,0 +1,13 @@
+% stack templates
+yesod-hello-world
+yesod-minimal
+yesod-mongo
+yesod-mysql
+yesod-postgres
+yesod-postgres-fay
+yesod-simple
+yesod-sqlite
+
+% stack exec -- yesod version
+yesod-bin version: 1.4.18.2
+
