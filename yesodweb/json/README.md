@@ -5,8 +5,6 @@ target urls:
    posts
    - post a new post:
      % curl -v -H "Accept: application/json" -H "Content-type: application/json" -X POST -d '{"title" : "this is a title.", "content" : "this is a content."}' http://localhost:3000/posts
-     >>> multi <<<
-     % curl -v -H "Accept: application/json" -H "Content-type: application/json" -X POST -d '[{"title" : "title-x.", "content" : "this is a x content."}, {"title" : "title-x.", "content" : "this is a x content."},{"title" : "title-x.", "content" : "this is a x content."}]' http://localhost:3000/posts
    - get all posts:
      % curl -v -H "Accept: application/json" http://localhost:3000/posts
    - get one post with ID:
@@ -15,6 +13,8 @@ target urls:
      % curl -v -H "Accept: application/json" -H "Content-type: application/json" -X PUT -d '{"title" : "updated title.", "content" : "updated content."}' http://localhost:3000/posts/1
    - delete a post with ID:
      % curl -v -H "Accept: application/json" -X DELETE http://localhost:3000/posts/1
+   - post multiple posts at once !
+     % curl -v -H "Accept: application/json" -H "Content-type: application/json" -X POST -d '[{"title" : "title-x.", "content" : "this is a x content."}, {"title" : "title-x.", "content" : "this is a x content."},{"title" : "title-x.", "content" : "this is a x content."}]' http://localhost:3000/mpost
 
    comments
    - post a new comment.

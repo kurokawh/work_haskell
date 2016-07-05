@@ -38,6 +38,7 @@ import Handler.Comment
 import Handler.Posts
 import Handler.Post
 import Handler.Comments
+import Handler.MultiPost
 
 -- This line actually creates our YesodDispatch instance. It is the second half
 -- of the call to mkYesodData which occurs in Foundation.hs. Please see the

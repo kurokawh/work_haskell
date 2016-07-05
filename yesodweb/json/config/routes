@@ -11,3 +11,4 @@
 /posts/#PostId PostR GET PUT DELETE
 /posts/#PostId/comments            CommentsR GET POST
 /posts/#PostId/comments/#CommentId CommentR  GET PUT DELETE
+/mpost MultiPostR POST

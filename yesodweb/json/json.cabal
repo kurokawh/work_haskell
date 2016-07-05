@@ -27,6 +27,7 @@ library
                      Handler.Posts
                      Handler.Post
                      Helpers.Comment
+                     Handler.MultiPost
 
     if flag(dev) || flag(library-only)
         cpp-options:   -DDEVELOPMENT

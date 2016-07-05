@@ -18,10 +18,8 @@ getPostsR = do
 
 postPostsR :: Handler ()
 postPostsR = do
-    --post <- requireJsonBody :: Handler Post
-    --_    <- runDB $ insert post -- normal operation
+    post <- requireJsonBody :: Handler Post
+    _    <- runDB $ insert post -- normal operation
     --_    <- runDB $ mapM insert ([post, post])  -- insert 2 records at once
-    posts <- requireJsonBody :: Handler [Post]
-    _    <- runDB $ mapM insert posts  -- insert list records at once
 
     sendResponseStatus status201 ("CREATED" :: Text)
