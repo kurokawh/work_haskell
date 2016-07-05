@@ -18,7 +18,7 @@ getHomeR = do
     let submission = Nothing :: Maybe (FileInfo, Text)
         handlerName = "getHomeR" :: Text
     defaultLayout $ do
-        let (commentFormId, commentTextareaId, commentListId) = commentIds
+        let (commentFormId, commentTextareaId, _) = commentIds
         aDomId <- newIdent
         setTitle "Welcome To Yesod!"
         $(widgetFile "homepage")
@@ -32,7 +32,7 @@ postHomeR = do
             _ -> Nothing
 
     defaultLayout $ do
-        let (commentFormId, commentTextareaId, commentListId) = commentIds
+        let (commentFormId, commentTextareaId, _) = commentIds
         aDomId <- newIdent
         setTitle "Welcome To Yesod!"
         $(widgetFile "homepage")
