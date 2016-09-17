@@ -6,12 +6,10 @@ import Turtle
 import Data.Text (unpack)
 
 callgrep shellfile = do
-  view shellfile
---  return shellfile
+--  view shellfile
   f <- shellfile
   input (fromString $ unpack f) & grep (prefix "import")
 
---countimport callfind = empty & inshell callfind & grep (prefix "import") & shell "wc -l"
 countimport callfind = empty & inshell callfind & callgrep & shell "wc -l"
 
 main = do
