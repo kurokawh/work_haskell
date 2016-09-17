@@ -3,9 +3,11 @@
 
 {-# LANGUAGE OverloadedStrings #-}
 import Turtle
+import Data.Text
 
-echoModified arg1 = do
-  date <- datefile (fromText arg1)
+echoModified file = do
+  date <- datefile (fromText file)
+  putStr ((unpack file) ++ "\t")
   echo (repr date)
 
 
