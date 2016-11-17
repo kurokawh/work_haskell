@@ -21,3 +21,9 @@ main = do
   print (BS.unpack contents)
   let x = BS.unpack contents   -- BS.unpack :: BS.ByteString -> [W.Word8]
   BS.writeFile to (BS.pack ((take 8 (drop 73 x)) ++ (take 8 (drop 51 x))))
+
+
+-- NOTE:
+--  BS.readFile is different from readFile.
+--    readFile :: FilePath -> IO String
+--    BS.readFile :: FilePath -> IO BS.ByteString
