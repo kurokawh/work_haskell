@@ -14,6 +14,7 @@ data Person = Person
     { name :: Text
     , age  :: Int
     }
+    deriving Show
 
 instance ToJSON Person where
     toJSON Person {..} = object
@@ -26,10 +27,12 @@ samplePersonList = [ (Person "Taro Yamada" 18)
                    , (Person "Hanako Yamada" 25)
                    , (Person "Ichiro Suzuki" 41) ]
 
-toCsv :: Person -> Text
-toCsv p = (name p) ++ (pack ",") ++ (pack $ show $ age p)
---toCsv p = (name p) ++ (pack ",") -- OK
---toCsv p = (name p) -- OK
+toCsv1 :: Person -> Text
+toCsv1 p = (name p) ++ (pack ",") ++ (pack $ show $ age p) ++ (pack "\n")
+
+toCsv :: [Person] -> Text -- Fix
+toCsv [] = pack ""
+toCsv (x:xs) = (toCsv1 x) ++ (toCsv xs)
 
 -- This is a handler function for the GET request method on the HomeR
 -- resource pattern. All of your resource patterns are defined in
@@ -40,7 +43,6 @@ toCsv p = (name p) ++ (pack ",") ++ (pack $ show $ age p)
 -- inclined, or create a single monolithic file.
 getHomeR :: Handler TypedContent
 getHomeR = selectRep $ do
---    provideRep $ defaultLayout [whamlet|Hello, my name is #{name person} and I am #{age person} years old.|]
     provideRep $ withUrlRenderer [hamlet|
                                          <table border>
                                              <tr>
@@ -51,16 +53,18 @@ getHomeR = selectRep $ do
                                                <td>#{name person}
                                                <td>#{age person}
                                  |]
-    provideRep (return value)  -- JSON : OK
+    provideJson $ samplePersonList
+--    provideRep (return $ toJSON person)  -- JSON : OK
 --    provideRep (return $ name person) -- Text : OK
---    provideJson $ person
 --    provideRepType "text/plain" (return $ repPlain $ name person) -- OK: Text
-    provideRepType "text/plain" (return $ name person) -- OK: Text
+--    provideRepType "text/plain" (return $ name person) -- OK: Text
+    provideRepType "text/plain" (return $ show samplePersonList) -- OK: Text
 --    provideRepType "text/csv" (return $ name person) -- OK: Text
-    provideRepType "text/csv" (return $ toCsv person)
-  where
-    person = Person "Taro Yamada" 18
-    value = toJSON person
+--    provideRepType "text/csv" (return $ toCsv person)
+    provideRepType "text/csv" (return $ toCsv samplePersonList)
+--  where
+--    person = Person "Taro Yamada" 18
+
 
 postHomeR :: Handler Html
 postHomeR = do
