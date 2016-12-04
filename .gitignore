@@ -17,7 +17,7 @@ cabal.config
 *.hp
 *.aux
 *~
-#*
+\#*
 .#*
 x.db
 *.svn
