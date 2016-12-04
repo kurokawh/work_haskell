@@ -35,7 +35,8 @@ toCsv p = (name p) ++ (pack ",") ++ (pack $ show $ age p)
 -- inclined, or create a single monolithic file.
 getHomeR :: Handler TypedContent
 getHomeR = selectRep $ do
-    provideRep $ defaultLayout [whamlet|Hello, my name is #{name person} and I am #{age person} years old.|]
+--    provideRep $ defaultLayout [whamlet|Hello, my name is #{name person} and I am #{age person} years old.|]
+    provideRep $ withUrlRenderer [hamlet|my hamlet|]
     provideRep (return value)  -- JSON : OK
 --    provideRep (return $ name person) -- Text : OK
 --    provideJson $ person
