@@ -1,3 +1,5 @@
+{-# LANGUAGE DeriveGeneric #-}
+
 module Handler.Home where
 
 import Import
@@ -10,26 +12,32 @@ data FileForm = FileForm
     , fileDescription :: Text
     }
 
+data Sex = Male | Female
+    deriving (Show, Generic)
 data Person = Person
     { name :: Text
     , age  :: Int
+    , sex  :: Sex
     }
-    deriving Show
+    deriving (Show, Generic)
 
-instance ToJSON Person where
-    toJSON Person {..} = object
-        [ "name" .= name
-        , "age"  .= age
-        ]
+instance ToJSON Sex 
+instance ToJSON Person 
+
 
 samplePersonList :: [Person]
-samplePersonList = [ (Person "Taro Yamada" 18)
-                   , (Person "Hanako Yamada" 25)
-                   , (Person "Ichiro Suzuki" 41) ]
+samplePersonList = [ (Person "Taro Yamada" 18 Male)
+                   , (Person "Hanako Yamada" 25 Female)
+                   , (Person "Ichiro Suzuki" 41 Male) ]
 
 -- Fix
 toCsv1 :: Person -> Text
-toCsv1 p = (name p) ++ ("," :: Text) ++ (pack $ show $ age p) ++ ("\n" :: Text)
+toCsv1 p = (name p) 
+           ++ ("," :: Text) 
+           ++ (pack $ show $ age p) 
+           ++ ("," :: Text) 
+           ++ (pack $ show $ sex p) 
+           ++ ("\n" :: Text)
 
 toCsv :: [Person] -> Text
 toCsv [] = ""
@@ -49,10 +57,12 @@ getHomeR = selectRep $ do
                                              <tr>
                                                <th>name
                                                <th>age
+                                               <th>sex
                                            $forall person <- samplePersonList
                                              <tr>
                                                <td>#{name person}
                                                <td>#{age person}
+                                               <td>#{show $ sex person}
                                  |]
     provideJson $ samplePersonList
 --    provideRep (return $ toJSON person)  -- JSON : OK
