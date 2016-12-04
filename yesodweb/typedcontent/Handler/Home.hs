@@ -27,11 +27,12 @@ samplePersonList = [ (Person "Taro Yamada" 18)
                    , (Person "Hanako Yamada" 25)
                    , (Person "Ichiro Suzuki" 41) ]
 
+-- Fix
 toCsv1 :: Person -> Text
-toCsv1 p = (name p) ++ (pack ",") ++ (pack $ show $ age p) ++ (pack "\n")
+toCsv1 p = (name p) ++ ("," :: Text) ++ (pack $ show $ age p) ++ ("\n" :: Text)
 
-toCsv :: [Person] -> Text -- Fix
-toCsv [] = pack ""
+toCsv :: [Person] -> Text
+toCsv [] = ""
 toCsv (x:xs) = (toCsv1 x) ++ (toCsv xs)
 
 -- This is a handler function for the GET request method on the HomeR
