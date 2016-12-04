@@ -21,6 +21,11 @@ instance ToJSON Person where
         , "age"  .= age
         ]
 
+samplePersonList :: [Person]
+samplePersonList = [ (Person "Taro Yamada" 18)
+                   , (Person "Hanako Yamada" 25)
+                   , (Person "Ichiro Suzuki" 41) ]
+
 toCsv :: Person -> Text
 toCsv p = (name p) ++ (pack ",") ++ (pack $ show $ age p)
 --toCsv p = (name p) ++ (pack ",") -- OK
@@ -36,7 +41,16 @@ toCsv p = (name p) ++ (pack ",") ++ (pack $ show $ age p)
 getHomeR :: Handler TypedContent
 getHomeR = selectRep $ do
 --    provideRep $ defaultLayout [whamlet|Hello, my name is #{name person} and I am #{age person} years old.|]
-    provideRep $ withUrlRenderer [hamlet|my hamlet|]
+    provideRep $ withUrlRenderer [hamlet|
+                                         <table border>
+                                             <tr>
+                                               <th>name
+                                               <th>age
+                                           $forall person <- samplePersonList
+                                             <tr>
+                                               <td>#{name person}
+                                               <td>#{age person}
+                                 |]
     provideRep (return value)  -- JSON : OK
 --    provideRep (return $ name person) -- Text : OK
 --    provideJson $ person
