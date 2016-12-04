@@ -10,6 +10,22 @@ data FileForm = FileForm
     , fileDescription :: Text
     }
 
+data Person = Person
+    { name :: Text
+    , age  :: Int
+    }
+
+instance ToJSON Person where
+    toJSON Person {..} = object
+        [ "name" .= name
+        , "age"  .= age
+        ]
+
+toCsv :: Person -> Text
+toCsv p = (name p) ++ (pack ",") ++ (pack $ show $ age p)
+--toCsv p = (name p) ++ (pack ",") -- OK
+--toCsv p = (name p) -- OK
+
 -- This is a handler function for the GET request method on the HomeR
 -- resource pattern. All of your resource patterns are defined in
 -- config/routes
@@ -17,16 +33,19 @@ data FileForm = FileForm
 -- The majority of the code you will write in Yesod lives in these handler
 -- functions. You can spread them across multiple files if you are so
 -- inclined, or create a single monolithic file.
-getHomeR :: Handler Html
-getHomeR = do
-    (formWidget, formEnctype) <- generateFormPost sampleForm
-    let submission = Nothing :: Maybe FileForm
-        handlerName = "getHomeR" :: Text
-    defaultLayout $ do
-        let (commentFormId, commentTextareaId, commentListId) = commentIds
-        aDomId <- newIdent
-        setTitle "Welcome To Yesod!"
-        $(widgetFile "homepage")
+getHomeR :: Handler TypedContent
+getHomeR = selectRep $ do
+    provideRep $ defaultLayout [whamlet|Hello, my name is #{name person} and I am #{age person} years old.|]
+    provideRep (return value)  -- JSON : OK
+--    provideRep (return $ name person) -- Text : OK
+--    provideJson $ person
+--    provideRepType "text/plain" (return $ repPlain $ name person) -- OK: Text
+    provideRepType "text/plain" (return $ name person) -- OK: Text
+--    provideRepType "text/csv" (return $ name person) -- OK: Text
+    provideRepType "text/csv" (return $ toCsv person)
+  where
+    person = Person "Taro Yamada" 18
+    value = toJSON person
 
 postHomeR :: Handler Html
 postHomeR = do
