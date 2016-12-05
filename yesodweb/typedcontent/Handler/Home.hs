@@ -30,18 +30,18 @@ samplePersonList = [ (Person "Taro Yamada" 18 Male)
                    , (Person "Hanako Yamada" 25 Female)
                    , (Person "Ichiro Suzuki" 41 Male) ]
 
--- Fix
-toCsv1 :: Person -> Text
-toCsv1 p = (name p) 
+class ToCSV a where
+  toCsv :: a -> Text
+instance ToCSV Person where
+  toCsv p = (name p) 
            ++ ("," :: Text) 
            ++ (pack $ show $ age p) 
            ++ ("," :: Text) 
            ++ (pack $ show $ sex p) 
            ++ ("\n" :: Text)
-
-toCsv :: [Person] -> Text
-toCsv [] = ""
-toCsv (x:xs) = (toCsv1 x) ++ (toCsv xs)
+instance (ToCSV a) => ToCSV [a] where
+  toCsv [] = ""
+  toCsv (x:xs) = (toCsv x) ++ (toCsv xs)
 
 -- This is a handler function for the GET request method on the HomeR
 -- resource pattern. All of your resource patterns are defined in
@@ -65,14 +65,14 @@ getHomeR = selectRep $ do
                                                <td>#{show $ sex person}
                                  |]
     provideJson $ samplePersonList
+    provideRepType "text/plain" (return $ show samplePersonList)
+    provideRepType "text/csv" (return $ toCsv samplePersonList)
 --    provideRep (return $ toJSON person)  -- JSON : OK
 --    provideRep (return $ name person) -- Text : OK
 --    provideRepType "text/plain" (return $ repPlain $ name person) -- OK: Text
 --    provideRepType "text/plain" (return $ name person) -- OK: Text
-    provideRepType "text/plain" (return $ show samplePersonList) -- OK: Text
 --    provideRepType "text/csv" (return $ name person) -- OK: Text
 --    provideRepType "text/csv" (return $ toCsv person)
-    provideRepType "text/csv" (return $ toCsv samplePersonList)
 --  where
 --    person = Person "Taro Yamada" 18
 
