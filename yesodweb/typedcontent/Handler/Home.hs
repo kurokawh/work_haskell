@@ -13,6 +13,8 @@ data FileForm = FileForm
     , fileDescription :: Text
     }
 
+
+-- サーバー上で管理するデータ定義。
 data Sex = Male | Female
     deriving (Show, Generic)
 data Person = Person
@@ -22,15 +24,17 @@ data Person = Person
     }
     deriving (Show, Generic)
 
-instance ToJSON Sex 
-instance ToJSON Person 
-
-
+-- サーバー上のサンプルデータ。3人分の情報を保持。
 samplePersonList :: [Person]
 samplePersonList = [ (Person "Taro Yamada" 18 Male)
                    , (Person "Hanako Yamada" 25 Female)
                    , (Person "Ichiro Suzuki" 41 Male) ]
 
+-- toJSONを自動導出。DeriveGeneric言語拡張が必要。
+instance ToJSON Sex 
+instance ToJSON Person 
+
+-- CSVフォーマットのレスポンスを生成する。
 class ToCSV a where
   toCsv :: a -> Text
 instance ToCSV Person where
@@ -44,16 +48,18 @@ instance (ToCSV a) => ToCSV [a] where
   toCsv [] = ""
   toCsv (x:xs) = (toCsv x) ++ (toCsv xs)
 
+-- ToContent/ToTypedcontentのインスタンスにすることで、
+-- getHomeRの型をHandler Csvにできる。
 mimeTypeCsv :: ContentType
 mimeTypeCsv = "text/csv"
 data Csv = forall a. ToCSV a => Csv a
-
 instance ToContent Csv where
   toContent (Csv a) = toContent $ toCsv a
 instance ToTypedContent Csv where
   toTypedContent = TypedContent mimeTypeCsv . toContent
 instance HasContentType Csv where
   getContentType _ = mimeTypeCsv
+
 
 -- This is a handler function for the GET request method on the HomeR
 -- resource pattern. All of your resource patterns are defined in
