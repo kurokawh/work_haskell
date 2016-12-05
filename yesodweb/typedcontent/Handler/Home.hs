@@ -1,4 +1,5 @@
 {-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE ExistentialQuantification #-}
 
 module Handler.Home where
 
@@ -43,6 +44,17 @@ instance (ToCSV a) => ToCSV [a] where
   toCsv [] = ""
   toCsv (x:xs) = (toCsv x) ++ (toCsv xs)
 
+mimeTypeCsv :: ContentType
+mimeTypeCsv = "text/csv"
+data Csv = forall a. ToCSV a => Csv a
+
+instance ToContent Csv where
+  toContent (Csv a) = toContent $ toCsv a
+instance ToTypedContent Csv where
+  toTypedContent = TypedContent mimeTypeCsv . toContent
+instance HasContentType Csv where
+  getContentType _ = mimeTypeCsv
+
 -- This is a handler function for the GET request method on the HomeR
 -- resource pattern. All of your resource patterns are defined in
 -- config/routes
@@ -66,7 +78,8 @@ getHomeR = selectRep $ do
                                  |]
     provideJson $ samplePersonList
     provideRepType "text/plain" (return $ show samplePersonList)
-    provideRepType "text/csv" (return $ toCsv samplePersonList)
+--    provideRepType "text/csv" (return $ toCsv samplePersonList)
+    provideRep $ return $ Csv samplePersonList
 --    provideRep (return $ toJSON person)  -- JSON : OK
 --    provideRep (return $ name person) -- Text : OK
 --    provideRepType "text/plain" (return $ repPlain $ name person) -- OK: Text
