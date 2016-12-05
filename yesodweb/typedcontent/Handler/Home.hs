@@ -60,6 +60,21 @@ instance ToTypedContent Csv where
 instance HasContentType Csv where
   getContentType _ = mimeTypeCsv
 
+-- HTML tableフォーマットでレスポンスを生成。
+toTableHtml :: Handler Html
+toTableHtml = withUrlRenderer [hamlet|
+             <table border>
+                 <tr>                                                         
+                   <th>name                                                   
+                   <th>age                                                    
+                   <th>sex                                                    
+               $forall person <- samplePersonList                             
+                 <tr>                                                         
+                   <td>#{name person}                                         
+                   <td>#{age person}                                          
+                   <td>#{show $ sex person}                            
+             |]
+
 
 -- This is a handler function for the GET request method on the HomeR
 -- resource pattern. All of your resource patterns are defined in
@@ -70,18 +85,7 @@ instance HasContentType Csv where
 -- inclined, or create a single monolithic file.
 getHomeR :: Handler TypedContent
 getHomeR = selectRep $ do
-    provideRep $ withUrlRenderer [hamlet|
-                                         <table border>
-                                             <tr>
-                                               <th>name
-                                               <th>age
-                                               <th>sex
-                                           $forall person <- samplePersonList
-                                             <tr>
-                                               <td>#{name person}
-                                               <td>#{age person}
-                                               <td>#{show $ sex person}
-                                 |]
+    provideRep $ toTableHtml
     provideJson $ samplePersonList
     provideRepType "text/plain" (return $ show samplePersonList)
 --    provideRepType "text/csv" (return $ toCsv samplePersonList)
