@@ -33,20 +33,19 @@ someMathFunction x y =
 
 -- use MaybeError
 data MaybeError a = Error String | Result a 
- 
 instance CanFail MaybeError where
     oops = Error "oops"
     pick (Result a) _ = Result a
     pick _ (Result a) = Result a
     pick _ _ = oops
     win a = Result a
-    
+
+-- Now I can also select the MaybeError type! 
+-- If I want to, I can also make it an instance of IO:    
 -- simplified. Runs an action and catches an exception.
 try :: IO a -> IO (MaybeError a)
 try = undefined
-
 throwException x = undefined
- 
 instance CanFail IO where
     oops = throwException "oops"
     pick first second = do
@@ -58,6 +57,8 @@ instance CanFail IO where
                 second
     win a = return a
 
+-- Now, we can use our safeDivision function in IO, 
+-- just like it were print or similar!
 main :: IO ()
 main = do
     putStrLn "Woah, look at us!" :: IO ()
