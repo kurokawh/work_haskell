@@ -10,6 +10,9 @@ module DoctestSample where
 -- 1
 -- >>> countSpace "    "
 -- 4
+--
+-- xxx: prop> countSpace s == sum [ 1 | c <- s, c == ' ' ]
+-- xxx: QuickCheck condition: not work on windows ?
 -- 
 countSpace :: String -> Int
 countSpace = length . filter (' ' ==)
