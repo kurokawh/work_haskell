@@ -5,8 +5,10 @@ import Text.Printf (printf)
 diff :: Double
 diff = 0.001
 
-fwrap :: [(Int, Int)] -> Double -> Double -> Double
-fwrap array accum x = accum + ((f array x) * diff)
+fwrap :: [(Int, Int)] -> (Double, Double) -> Double -> (Double, Double)
+fwrap array accum x = ((fst accum) + (y * diff), (snd accum) + (pi * y ^ 2) * diff)
+  where
+    y = (f array x)
 
 f :: [(Int, Int)] -> Double -> Double
 f (s:xs) x = (fromIntegral $ fst s) * (x ^ (fromIntegral $ snd s)) + (f xs x)
@@ -24,7 +26,9 @@ ab [] _ = []
 
 -- This function should return a list [area, volume].
 solve :: Int -> Int -> [Int] -> [Int] -> [Double]
-solve l r a b = foldl  (fwrap (ab a b)) 0.0 (range l r) : []
+solve l r a b = fst tpl : snd tpl : []
+  where
+    tpl = foldl  (fwrap (ab a b)) (0.0,0.0) (range l r)
 
 --Input/Output.
 main :: IO ()
