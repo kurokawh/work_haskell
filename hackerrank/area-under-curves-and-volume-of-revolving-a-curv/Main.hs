@@ -15,7 +15,7 @@ f (s:xs) x = (fromIntegral $ fst s) * (x ^ (fromIntegral $ snd s)) + (f xs x)
 f [] _ = 0
 
 range :: Int -> Int -> [Double]
-range l r = [x | x <-[dl, (dl + diff) .. (dr)], x < dr]
+range l r = [x | x <-[dl, (dl + diff) .. dr]]
     where
         dl = fromIntegral l
         dr = fromIntegral r
