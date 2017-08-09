@@ -1,4 +1,15 @@
 -- https://www.hackerrank.com/challenges/area-under-curves-and-volume-of-revolving-a-curv
+{-
+NOTE: runtime error occurs with (^) if b is not Integral.
+Prelude> :t (^)
+(^) :: (Integral b, Num a) => a -> b -> a
+Prelude> :t (^^)
+(^^) :: (Fractional a, Integral b) => a -> b -> a
+Prelude> :t (**)
+(**) :: Floating a => a -> a -> a
+Prelude> :i Double
+-}
+
 
 import Text.Printf (printf)
 
@@ -6,12 +17,12 @@ diff :: Double
 diff = 0.001
 
 fwrap :: [(Int, Int)] -> (Double, Double) -> Double -> (Double, Double)
-fwrap array accum x = ((fst accum) + (y * diff), (snd accum) + (pi * y ^ 2) * diff)
+fwrap array accum x = ((fst accum) + (y * diff), (snd accum) + (pi * y ** 2) * diff)
   where
     y = (f array x)
 
 f :: [(Int, Int)] -> Double -> Double
-f (s:xs) x = (fromIntegral $ fst s) * (x ^ (fromIntegral $ snd s)) + (f xs x)
+f (s:xs) x = (fromIntegral $ fst s) * (x ** (fromIntegral $ snd s)) + (f xs x)
 f [] _ = 0
 
 range :: Int -> Int -> [Double]
