@@ -6,14 +6,14 @@ diff :: Double
 diff = 0.001
 
 fwrap :: [(Int, Int)] -> Double -> Double -> Double
-fwrap array accum x = accum + ((f array x) * diff * 2)
+fwrap array accum x = accum + ((f array x) * diff)
 
 f :: [(Int, Int)] -> Double -> Double
 f (s:xs) x = (fromIntegral $ fst s) * (x ^ (fromIntegral $ snd s)) + (f xs x)
 f [] _ = 0
 
 range :: Int -> Int -> [Double]
-range l r = [x | x <-[(dl + diff), (dl+(diff*3)) .. (dr-diff)]]
+range l r = [x | x <-[dl, (dl + diff) .. (dr)], x < dr]
     where
         dl = fromIntegral l
         dr = fromIntegral r
