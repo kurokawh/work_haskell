@@ -2,15 +2,18 @@
 
 import Text.Printf (printf)
 
+diff :: Double
+diff = 0.001
+
 fwrap :: [(Int, Int)] -> Double -> Double -> Double
-fwrap array accum x = accum + (f array x)
+fwrap array accum x = accum + ((f array x) * diff * 2)
 
 f :: [(Int, Int)] -> Double -> Double
 f (s:xs) x = (fromIntegral $ fst s) * (x ^ (fromIntegral $ snd s)) + (f xs x)
 f [] _ = 0
 
 range :: Int -> Int -> [Double]
-range l r = [x | x <-[dl, (dl+0.001) .. (dr)]]
+range l r = [x | x <-[(dl + diff), (dl+(diff*3)) .. (dr-diff)]]
     where
         dl = fromIntegral l
         dr = fromIntegral r
