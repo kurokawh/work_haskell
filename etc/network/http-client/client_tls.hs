@@ -15,3 +15,7 @@ main = do
     putStrLn $ "The status code was: " ++
                show (statusCode $ responseStatus response)
     print $ responseBody response
+
+-- 
+-- https://haskell-lang.org/library/http-client
+-- Lower level API

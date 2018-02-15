@@ -17,3 +17,7 @@ main = do
 
       
 -- https://hackage.haskell.org/package/http-client
+-- Caveats
+{--
+By default, http-client will respect the http_proxy and https_proxy environment variables. See the proxy examples below for information on how to bypass this.
+--}
