@@ -8,9 +8,12 @@ import           Network.HTTP.Types.Status  (statusCode)
 
 main :: IO ()
 main = do
-    manager <- newManager $ managerSetProxy (proxyEnvironment Nothing) tlsManagerSettings -- this refers https_proxy.
+    manager <- newManager $ managerSetProxy noProxy tlsManagerSettings -- this does not refer https_proxy.
+--    manager <- newManager $ managerSetProxy (proxyEnvironment Nothing) tlsManagerSettings -- this refers https_proxy.
+
 
     response <- httpLbs (applyBasicAuth "user" "pass" "https://github.com/") manager
+    
 
     putStrLn $ "The status code was: "
             ++ show (statusCode $ responseStatus response)
