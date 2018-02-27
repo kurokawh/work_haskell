@@ -5,9 +5,13 @@ import Network.HTTP.Client.TLS (tlsManagerSettings) -- 新たにimport文を追�
 
 
 import Network.HTTP.Client.Internal
--- tlsManagerSettingsをベースにmanagerResponseTimeoutをデフォルトの30秒から5秒に変更
+-- tlsManagerSettingsをベースにmanagerResponseTimeoutを30→5秒に、
+-- managerConnCountを10→3に変更
 mySettings :: ManagerSettings
-mySettings = tlsManagerSettings { managerResponseTimeout = responseTimeoutMicro 5000000 } 
+mySettings = tlsManagerSettings
+             { managerResponseTimeout = responseTimeoutMicro 5000000
+             , managerConnCount = 3
+             }
 
 
 main :: IO ()
