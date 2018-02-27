@@ -6,15 +6,17 @@ main :: IO ()
 main = do
   manager <- newManager defaultManagerSettings
 
-  initialRequest <- parseRequest "http://httpbin.org/headers"
+--  initialRequest <- parseRequest "http://httpbin.org/headers"
+  initialRequest <- parseRequest "http://httpbin.org/anything?foo=bar&xxx=yyy"
   let request = initialRequest
-          { method = "GET"
---          , requestBody = ""
+          { method = "POST"
+          , requestBody = "body string."
           , requestHeaders =
               [ ("User-Agent", "New Agent!")
+              , ("Content-Type", "text/plain")
+              , ("Added-Header", "hoge")
               ]
           }
-  
   response <- httpLbs request manager
 
   putStrLn $ "The status code was: " ++ (show $ statusCode $ responseStatus response)
