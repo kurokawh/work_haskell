@@ -6,18 +6,19 @@ main :: IO ()
 main = do
   manager <- newManager defaultManagerSettings
 
---  initialRequest <- parseRequest "http://httpbin.org/headers"
-  initialRequest <- parseRequest "http://httpbin.org/anything?foo=bar&xxx=yyy"
+  initialRequest <- parseRequest "http://httpbin.org/anything"
   let request = initialRequest
-          { method = "POST"
-          , requestBody = "body string."
-          , requestHeaders =
+          { method = "POST"   -- "GET", "PUT", "DELETE"などのメソッドを指定
+          , queryString = "foo=bar&xxx=yyy" -- parseRequestのuriに記述してもよい
+          , requestHeaders =  -- ヘッダはタプル（名前、値）のリストで指定
               [ ("User-Agent", "New Agent!")
               , ("Content-Type", "text/plain")
               , ("Added-Header", "hoge")
               ]
+          , requestBody = "body string."
           }
-  response <- httpLbs request manager
+  let authRequest = applyBasicAuth "user" "pass" request -- ベーシック認証情報付与
+  response <- httpLbs authRequest manager
 
   putStrLn $ "The status code was: " ++ (show $ statusCode $ responseStatus response)
   print $ responseBody response
