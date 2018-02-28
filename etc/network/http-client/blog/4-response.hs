@@ -1,6 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 import Network.HTTP.Client
 import Network.HTTP.Types.Status (statusCode)
+import qualified Data.ByteString as B
 
 main :: IO ()
 main = do
@@ -8,29 +9,26 @@ main = do
 
   request <- parseRequest "http://httpbin.org/get"
 --  response <- httpLbs request manager
---  response <- withResponse request manager receiveResponse
   withResponse request manager receiveResponse
---  response <- withResponse request manager res
 
-{--
-  putStrLn $ "response version: " ++ (show $ responseVersion response)
-  putStrLn $ "status code: " ++ (show $ statusCode $ responseStatus response)
-  putStrLn $ "response header: " ++ (show $ responseHeaders response)
-  putStrLn $ "response body: " ++ (show $ responseBody response)
---}
---  return ()
 
---receiveResponse :: Response BodyReader -> IO Data.ByteString.Internal.ByteString
+receiveResponse :: Response BodyReader -> IO ()
 receiveResponse response = do
   putStrLn $ "response version: " ++ (show $ responseVersion response)
   putStrLn $ "status code: " ++ (show $ statusCode $ responseStatus response)
   putStrLn $ "response header: " ++ (show $ responseHeaders response)
---  putStrLn $ "response body: " ++ (show $ responseBody response)
-  bs <- brRead $ responseBody response
-  putStrLn $ "response body: " ++ (show bs)
-  return ()
 
---res x = undefined
+  -- receive body data block by block
+  let loop = do
+        bs <- brRead $ responseBody response
+        if B.null bs
+          then putStrLn "\nFinished response body"
+          else do
+            --B.hPut stdout bs
+            print bs
+            loop
+  loop
 
 
+-- https://github.com/snoyberg/http-client/blob/master/TUTORIAL.md
 -- https://stackoverflow.com/questions/36733472/how-to-store-a-functions-return-argument-in-haskell
