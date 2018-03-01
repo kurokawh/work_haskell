@@ -8,7 +8,6 @@ main = do
   manager <- newManager defaultManagerSettings
 
   request <- parseRequest "http://httpbin.org/get"
---  response <- httpLbs request manager
   withResponse request manager receiveResponse
 
 
@@ -24,7 +23,6 @@ receiveResponse response = do
         if B.null bs
           then putStrLn "\nFinished response body"
           else do
-            --B.hPut stdout bs
             print bs
             loop
   loop
