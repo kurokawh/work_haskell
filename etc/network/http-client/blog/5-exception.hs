@@ -4,13 +4,22 @@ import Network.HTTP.Types.Status (statusCode)
 import Control.Exception (try)
 
 
+createRequest :: String -> IO Request
+createRequest uri = do
+  eRequest <- try $ parseRequest uri
+  case eRequest of
+    Left e -> do
+         print (e :: HttpException)
+         parseRequest "http://unknown-host:80/" -- valid url but not exists
+    Right request -> return $ request
+
+
 main :: IO ()
 main = do
   manager <- newManager defaultManagerSettings
+  request <- createRequest "///xxx//invalid uri/" -- invalid url
 
-  request <- parseRequest "http://unknown-host:80/"
   eResponse <- try $ httpLbs request manager
-
   case eResponse of
     Left e -> print (e :: HttpException)
     Right response -> do
