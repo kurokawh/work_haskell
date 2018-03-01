@@ -28,3 +28,5 @@ main = do
         Left e -> print (e :: HttpException)
         Right response -> L8.putStrLn $ responseBody response
 
+-- https://github.com/snoyberg/http-client/blob/master/TUTORIAL.md
+
