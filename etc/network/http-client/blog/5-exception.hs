@@ -2,14 +2,13 @@
 import Network.HTTP.Client
 import Network.HTTP.Types.Status (statusCode)
 import Control.Exception (try)
-import qualified Data.ByteString.Lazy.Char8 as L8
 
-{--
+
 main :: IO ()
 main = do
   manager <- newManager defaultManagerSettings
 
-  request <- parseRequest "http://httpbin.org/get"
+  request <- parseRequest "http://unknown-host:80/"
   eResponse <- try $ httpLbs request manager
 
   case eResponse of
@@ -17,9 +16,10 @@ main = do
     Right response -> do
        putStrLn $ "The status code was: " ++ (show $ statusCode $ responseStatus response)
        print $ responseBody response
---}
 
-main :: IO ()
+
+{--
+--import qualified Data.ByteString.Lazy.Char8 as L8main :: IO ()
 main = do
     manager <- newManager defaultManagerSettings
     eresponse <- try $ httpLbs "http://does-not-exist" manager
@@ -29,4 +29,4 @@ main = do
         Right response -> L8.putStrLn $ responseBody response
 
 -- https://github.com/snoyberg/http-client/blob/master/TUTORIAL.md
-
+--}
