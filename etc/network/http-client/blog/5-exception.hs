@@ -2,29 +2,38 @@
 import Network.HTTP.Client
 import Network.HTTP.Types.Status (statusCode)
 import Control.Exception (try)
+import System.Environment (getArgs)
 
 
-createRequest :: String -> IO Request
-createRequest uri = do
-  eRequest <- try $ parseRequest uri
+createRequest :: [String] -> IO Request
+createRequest [] = do
+  putStrLn "NOTE: no argument is given. so use not existing url."
+  parseRequest "http://unknown-host:80/" -- valid but not exists
+createRequest args = do
+  let url = head args
+  eRequest <- try $ parseRequest url
   case eRequest of
     Left e -> do
-         print (e :: HttpException)
-         parseRequest "http://unknown-host:80/" -- valid url but not exists
+      print (e :: HttpException)
+      putStrLn $ "given url (1st argument) is invalid: " ++ url
+      error "error!"
     Right request -> return $ request
 
 
 main :: IO ()
 main = do
+  args <- getArgs
   manager <- newManager defaultManagerSettings
-  request <- createRequest "///xxx//invalid uri/" -- invalid url
+  request <- createRequest args
 
   eResponse <- try $ httpLbs request manager
   case eResponse of
-    Left e -> print (e :: HttpException)
+    Left e -> do
+      print (e :: HttpException)
+      putStrLn $ "cannot reach server with given url: " ++ (head args)
     Right response -> do
-       putStrLn $ "The status code was: " ++ (show $ statusCode $ responseStatus response)
-       print $ responseBody response
+      putStrLn $ "The status code was: " ++ (show $ statusCode $ responseStatus response)
+      print $ responseBody response
 
 
 {--
